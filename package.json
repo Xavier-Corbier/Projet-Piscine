@@ -11,8 +11,11 @@
     "test": "node test.js"
   },
   "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
     "ejs": "^2.5.6",
-    "express": "^4.15.2"
+    "express": "^4.15.2",
+    "mongoose": "^5.11.1"
   },
   "devDependencies": {
     "got": "^11.3.0",

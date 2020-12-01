@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
 
-router.post('/', require('./addStudent'));
+router.post('/add', require('./addStudent'));
 
 module.exports = router;

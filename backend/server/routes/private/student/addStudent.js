@@ -1,3 +1,3 @@
-const Student = require('./models/student');
+const Student = require('');
 
 app.post('/api/')
