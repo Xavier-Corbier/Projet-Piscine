@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const studentSchema = mongoose.Schema({
     // n° étudiant à peut être crypter ?
-    _id: { type: Int, required: true , unique: true },
+    _id: { type: Number, required: true , unique: true },
     firstname: { type: String, required: true },
     lastname: { type: String, required: true },
     promo: { type: String, required: true },

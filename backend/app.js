@@ -13,9 +13,9 @@ const app = express();
 app.use(cors());
 
 //routes accessible without being authenticated are redirected in routes
-app.use("/api", require('./server/routes/public'));
+//app.use("/api", require('./server/routes/public'));
 
-//All routes with retricted content pass trough the isAuth middleware to verify authentication
+//All routes with restricted content pass trough the isAuth middleware to verify authentication
 app.use("/api", /*require('./server/middleware/auth'),*/ require('./server/routes/private'));
 
 /* Handling errors */

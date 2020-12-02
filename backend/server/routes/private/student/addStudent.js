@@ -1,3 +1,5 @@
-const Student = require('');
+const Student = require('../../../models/Student');
 
-app.post('/api/')
+exports.addStudent = function(req, res, next) {
+    console.log(req.body)
+}
