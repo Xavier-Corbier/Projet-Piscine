@@ -11,9 +11,18 @@ const addPromo = (req, res, next) => {
 
 const addStudentToPromo = (req, res, next) => {
     try {
-        const promo = promoController.findOneAndUpdate({_id: _id}, {$push: {"studentList": student}}, {new: true});
+        const promo = req.body.promo;
+        const student = req.body.student;
+        return promoController.findOneAndUpdate({_id: req.body.id}, {$addToSet: {"studentList": student}}, {new: true});
     }catch (error){
         throw error
     }
 }
-module.exports = {addPromo}
+
+const getPromo = (req, res, next) => {
+    Promo.findOne({"name": req.body.name})
+        .then((promo) => {res.status(201).json({promo})})
+        .catch((error) => {res.status(400).json({error: error})});
+}
+
+module.exports = {addStudentToPromo, getPromo}
