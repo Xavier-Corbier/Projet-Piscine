@@ -12,10 +12,11 @@ const app = express();
 
 app.use(cors());
 
-//routes accessible without being authenticated are redirected in routes
+// Les requêtes qui ne passent pas par le middleware d'authentification sont redirigées vers le router public
+// TODO: implémenter le router public
 //app.use("/api", require('./server/routes/public'));
 
-//All routes with restricted content pass trough the isAuth middleware to verify authentication
+// Les requêtes qui passent par le middleware d'authentification sont redirigées vers le router privé
 app.use("/api", /*require('./server/middleware/auth'),*/ require('./server/routes/private'));
 
 /* Handling errors */
