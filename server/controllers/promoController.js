@@ -1,4 +1,4 @@
-const Promo = require('../../../models/Promo');
+const Promo = require('../models/Promo');
 
 const addPromo = (req, res, next) => {
     const promo = new Promo({
@@ -16,4 +16,12 @@ const addStudentToPromo = (req, res, next) => {
         throw error
     }
 }
-module.exports = {addPromo}
+
+const getPromo = (req, res, next) => {
+    console.log("ok")
+    const promo = Promo.findOne({_id: req.body.id})
+        .then(thing => res.status(200).json(promo))
+        .catch(error => res.status(404).json({error}));
+};
+
+module.exports = {addPromo, getPromo}
