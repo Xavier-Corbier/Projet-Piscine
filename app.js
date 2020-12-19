@@ -4,13 +4,13 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const app = express();
 
-/*mongoose.connect(process.env.MONGODB_URI,
+mongoose.connect(process.env.MONGO_URI,
     { useNewUrlParser: true,
         useUnifiedTopology: true })
     .then(() => console.log('Connexion à MongoDB réussie !'))
-    .catch(() => console.log('Connexion à MongoDB échouée !'));*/
+    .catch(() => console.log('Connexion à MongoDB échouée !'));
 
-app.use(cors());
+app.use(cors()); // TODO: se documenter sur cors
 
 // Les requêtes qui ne passent pas par le middleware d'authentification sont redirigées vers le router public
 // TODO: implémenter le router public
