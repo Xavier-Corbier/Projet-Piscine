@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-router.post('/add', require('./addStudent'));
+router.post('/create', require('./createStudent'));
 router.delete('/delete', require('./deleteStudent'));
 router.get('/byName', require('./getStudentByName'));
 
