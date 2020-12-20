@@ -11,15 +11,17 @@ const addPromo = (req, res, next) => {
 }
 
 */
-const addStudentToPromo = (req, res, next) => {
-    const promo = promoController.findOneAndUpdate({_id: _id}, {$push: {"studentList": student}}, {new: true});
+const addStudentToPromo = (idPromo, student, res) => {
+    Promo.findOneAndUpdate({_id: idPromo}, {$push: {"studentList": student}})
+        .then(() => res.status(200).json({ message: 'Objet modifié !'}))
+        .catch(error => res.status(400).json({ error }));
 }
 
 
 const addPromo = (req, res, next) => {
     const promo = new Promo (
         {
-            name: "Ancien"
+            ...req.body
         });
     promo.save()
         .then(() => res.status(201).json({message: 'Object save'}))
@@ -39,10 +41,10 @@ const getPromoById = (req, res, next) => {
         .catch(error => {res.status(404).json({error: error})});
 }
 
-const getIdPromoByName = (name) => {
-    const promo = Promo.findOne({name: name});
-    console.log(promo);
-    return promo.id
+const getIdPromoByName = (req, res, next) => {
+    const promo = Promo.findOne({ name: req.params.name})
+        .then((promo) => {res.status(200).json(promo)})
+        .catch(error => {res.status(404).json({error: error})});
 }
 
-module.exports = {getPromo, getPromoById, getIdPromoByName}
+module.exports = {addStudentToPromo, getPromo, getPromoById, getIdPromoByName}

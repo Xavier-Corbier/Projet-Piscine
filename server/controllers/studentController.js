@@ -1,5 +1,4 @@
 const Student = require('../models/Student');
-const promoController = require('./promoController');
 // CRUD
 
 module.exports.addStudent = (req, res, next) => {
@@ -18,16 +17,26 @@ module.exports.addStudent = (req, res, next) => {
         .catch(error => res.status(400).json({ error }));
 };
 
-module.exports.getStudent = (req, res, next) => {
+module.exports.updateStudent = (req, res, next) => {
+    Student.updateOne({ _id: req.params.id }, {...req.body, _id: req.params.id })
+        .then(() => res.status(200).json({ message: 'Objet modifié !'}))
+        .catch(error => res.status(400).json({ error }));
+};
+
+module.exports.deleteStudent = (req, res, next) => {
+    Student.deleteOne({ _id: req.params.id})
+        .then(() => res.status(200).json({ message: 'Objet supprimé !'}))
+        .catch(error => res.status(400).json({ error }));
+};
+
+module.exports.getStudent = (req, res, next) => { //renvoie la liste de tout les étudiants
     const students = Student.find()
         .then((students) => {res.status(200).json(students)})
         .catch(error => {res.status(404).json({error: error})});
 }
 
-module.exports.updateStudent = (req, res, next) => {
-    // TODO
-};
-
-module.exports.deleteStudent = (req, res, next) => {
-    // TODO
-};
+module.exports.getStudentById = (req, res, next) => { //renvoie une étudiant selon son id
+    const student = Student.findOne({ _id: req.params.id})
+        .then((student) => {res.status(200).json(student)})
+        .catch(error => {res.status(404).json({error: error})});
+}
