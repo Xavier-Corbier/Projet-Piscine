@@ -10,7 +10,7 @@ const addPromo = (req, res, next) => {
         .catch(error => res.status(400).json({ error }));
 }
 
-
+*/
 const addStudentToPromo = (req, res, next) => {
     const promo = promoController.findOneAndUpdate({_id: _id}, {$push: {"studentList": student}}, {new: true});
 }
@@ -25,7 +25,7 @@ const addPromo = (req, res, next) => {
         .then(() => res.status(201).json({message: 'Object save'}))
         .catch(error => {res.status(400).json({error: error})});
 }
-*/
+
 
 const getPromo = (req, res, next) => {
     const promos = Promo.find()
@@ -39,4 +39,10 @@ const getPromoById = (req, res, next) => {
         .catch(error => {res.status(404).json({error: error})});
 }
 
-module.exports = {getPromo, getPromoById}
+const getIdPromoByName = (name) => {
+    const promo = Promo.findOne({name: name});
+    console.log(promo);
+    return promo.id
+}
+
+module.exports = {getPromo, getPromoById, getIdPromoByName}
