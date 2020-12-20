@@ -2,6 +2,8 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+
 const app = express();
 
 mongoose.connect(process.env.MONGO_URI,
@@ -11,6 +13,8 @@ mongoose.connect(process.env.MONGO_URI,
     .catch(() => console.log('Connexion à MongoDB échouée !'));
 
 app.use(cors()); // TODO: se documenter sur cors
+
+app.use(bodyParser.json());
 
 // Les requêtes qui ne passent pas par le middleware d'authentification sont redirigées vers le router public
 // TODO: implémenter le router public
