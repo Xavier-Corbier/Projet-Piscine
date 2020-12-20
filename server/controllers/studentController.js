@@ -1,6 +1,4 @@
-//const Student = require('../../../models/Student');
-
-// CRUD
+const Student = require('../models/Student');
 
 module.exports.addStudent = (req, res, next) => {
     // TODO

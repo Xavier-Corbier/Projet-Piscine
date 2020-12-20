@@ -4,12 +4,9 @@ npm-debug.log
 .idea
 *.iml
 
-
 # Local development
+.env
 *.env
 *.dev
 .DS_Store
 
-# Docker
-Dockerfile
-docker-compose.yml

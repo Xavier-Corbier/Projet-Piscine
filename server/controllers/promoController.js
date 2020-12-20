@@ -1,5 +1,24 @@
 const Promo = require('../../../models/Promo');
 
+const Promo = require('../models/Promo');
+
+module.exports.addPromo = (req, res, next) => {
+    // TODO
+};
+
+module.exports.getPromo = (req, res, next) => {
+    // TODO
+};
+
+module.exports.updatePromo = (req, res, next) => {
+    // TODO
+};
+
+module.exports.deletePromo = (req, res, next) => {
+    // TODO
+};
+
+/*
 const addPromo = (req, res, next) => {
     const promo = new Promo({
         ...req.body
@@ -16,4 +35,6 @@ const addStudentToPromo = (req, res, next) => {
         throw error
     }
 }
+
 module.exports = {addPromo}
+ */
