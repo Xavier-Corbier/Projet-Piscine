@@ -41,10 +41,13 @@ const getPromoById = (req, res, next) => {
         .catch(error => {res.status(404).json({error: error})});
 }
 
+/*
 const getIdPromoByName = (req, res, next) => {
     const promo = Promo.findOne({ name: req.params.name})
         .then((promo) => {res.status(200).json(promo)})
         .catch(error => {res.status(404).json({error: error})});
 }
 
-module.exports = {addStudentToPromo, getPromo, getPromoById, getIdPromoByName}
+ */
+
+module.exports = {addStudentToPromo, getPromo, getPromoById, } // getIdPromoByName
