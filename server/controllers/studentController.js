@@ -1,42 +1,81 @@
+const bcrypt = require('bcrypt');
+
 const Student = require('../models/Student');
 // CRUD
 
-module.exports.addStudent = (req, res, next) => {
-    // TODO
-    const student = new Student({
-        studentNumber: req.body.studentNumber,
-        firstname: req.body.firstname,
-        lastname: req.body.lastname,
-        promo: req.body.promo,
-        email: req.body.email,
-        password: req.body.password
-         // à utiliser avec attention, on doit se mettre d'accord sur ce qu'il y a dans le corps de la req
-    });
-    student.save()
-        .then(() => res.status(201).json({ message: 'Objet enregistré !'}))
-        .catch(error => res.status(400).json({ error }));
+module.exports.addStudent = async (studentObject) => {
+    try {
+        const hash = await bcrypt.hash(studentObject.password, 10);
+        const student = new Student({
+            studentNumber: studentObject.studentNumber,
+            firstname: studentObject.firstname,
+            lastname: studentObject.lastname,
+            promo: studentObject.promo,
+            email: studentObject.email,
+            password: hash
+        });
+        return await student.save();
+    }catch (error){
+        console.log(error.message);
+        throw error;
+    }
 };
 
-module.exports.updateStudent = (req, res, next) => {
-    Student.updateOne({ _id: req.params.id }, {...req.body, _id: req.params.id })
-        .then(() => res.status(200).json({ message: 'Objet modifié !'}))
-        .catch(error => res.status(400).json({ error }));
-};
-
-module.exports.deleteStudent = (req, res, next) => {
-    Student.deleteOne({ _id: req.params.id})
-        .then(() => res.status(200).json({ message: 'Objet supprimé !'}))
-        .catch(error => res.status(400).json({ error }));
-};
-
-module.exports.getStudent = (req, res, next) => { //renvoie la liste de tout les étudiants
-    const students = Student.find()
-        .then((students) => {res.status(200).json(students)})
-        .catch(error => {res.status(404).json({error: error})});
+module.exports.addGroupToStudent = async (idStudent, idGroup) => {
+    try{
+        await Student.updateOne({_id: idStudent}, {group: idGroup, _id: idStudent});
+        return await Student.findOne({_id: idStudent});
+    }catch (e) {
+        console.log(e.message);
+    }
 }
 
-module.exports.getStudentById = (req, res, next) => { //renvoie une étudiant selon son id
-    const student = Student.findOne({ _id: req.params.id})
-        .then((student) => {res.status(200).json(student)})
-        .catch(error => {res.status(404).json({error: error})});
+module.exports.updateStudent = async (idStudent, studentObject) => {
+    try {
+        await Student.updateOne({_id: idStudent}, {...studentObject, _id: idStudent});
+        return await Student.findOne({_id: idStudent});
+    }catch (e) {
+        console.log(e.message);
+    }
+};
+
+module.exports.deleteStudent = async (idStudent) => {
+    try{
+        return await Student.deleteOne({ _id: idStudent});
+    }catch (e) {
+        console.log(e.message);
+    }
+};
+
+module.exports.getAllStudents = async () => { //renvoie la liste de tout les étudiants
+    try{
+        return await Student.find();
+    }catch (e) {
+        console.log(e.message);
+    }
+};
+
+module.exports.getStudentById = async (idStudent) => { //renvoie une étudiant selon son id
+    try{
+        return await Student.findOne({ _id: idStudent})
+    }catch (e) {
+        console.log(e.message);
+    }
+};
+
+module.exports.getStudentByName = async (name) => { //renvoie une étudiant selon son nom et prenom
+    //prendre en compte que deux étudiants peuvent avoir les mêmes noms et prénoms
+    try{
+        return await Student.findOne({ name: name});
+    }catch (e) {
+        console.log(e.message);
+    }
+};
+
+/*
+module.exports.removeCollection = (req, res, next) => {
+    Student.remove()
+        .then(() => {res.status(200).json({message: "ok"})})
+        .catch(error => {res.status(404).json({error: error})})
 }
+*/

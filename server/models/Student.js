@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
-// TODO: implémenter le module UniqueValidator pour le studentNumber
+const uniqueValidator = require('mongoose-unique-validator');
+
 
 const studentSchema = mongoose.Schema({
     // n° étudiant à peut être crypter ?
@@ -7,7 +8,7 @@ const studentSchema = mongoose.Schema({
     firstname: { type: String, required: true },
     lastname: { type: String, required: true },
     promo: { type: String, required: true },
-    email: { type: String, required: true },
+    email: { type: String, required: true, unique: true},
     password: { type: String, required: true },
     /*
     Si la prof peut ajouter un étudiant alors le password/email n'est pas required, ce sera à l'étudiant
@@ -19,5 +20,7 @@ const studentSchema = mongoose.Schema({
     group: { type: mongoose.Schema.Types.ObjectId, ref: 'Group'}
     // pas required car à la création l'étudiant n'a pas de groupProject
 });
+
+studentSchema.plugin(uniqueValidator);
 
 module.exports = mongoose.model('Student', studentSchema);
