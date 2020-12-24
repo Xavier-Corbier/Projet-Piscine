@@ -9,45 +9,62 @@ const addPromo = (req, res, next) => {
         .then(() => res.status(201).json({ message: 'Objet enregistré !'}))
         .catch(error => res.status(400).json({ error }));
 }
-
 */
-const addStudentToPromo = (idPromo, student, res) => {
-    Promo.findOneAndUpdate({_id: idPromo}, {$push: {"studentList": student}})
-        .then(() => res.status(200).json({ message: 'Objet modifié !'}))
-        .catch(error => res.status(400).json({ error }));
+
+const addStudentToPromo = async (idPromo, idStudent) => {
+    try {
+        return await Promo.findByIdAndUpdate({_id: idPromo}, {$push: {studentList: idStudent}})
+    }catch (error) {
+        console.log(error.message);
+        throw error;
+    }
+}
+
+const deleteStudentToPromo = async (idPromo, idStudent) => {
+    try {
+        console.log(idPromo, idStudent);
+        return await Promo.findByIdAndUpdate({_id: idPromo}, {$pull: {studentList: idStudent}})
+    }catch (error) {
+        console.log(error.message);
+        throw error;
+    }
+}
+
+const getPromos = async () => {
+    try {
+        const promos = Promo.find();
+        return await promos
+    }catch (e) {
+        console.log(e.message);
+    }
+}
+
+const getPromoById = async (id) => {
+    try {
+        const promo = Promo.findOne({_id: id});
+        return await promo
+    }catch (e) {
+        console.log(e.message);
+    }
+}
+
+const getPromoByName = async (name) => {
+    try {
+        const promo = Promo.findOne({name : name});
+        return await promo
+    }catch (e) {
+        console.log(e.message);
+    }
+}
+
+const getIdPromoByName = async (name) => {
+    try {
+        const promo = Promo.findOne({name: name});
+        return await promo.id
+    }catch (e) {
+        console.log(e.message);
+    }
 }
 
 
-const addPromo = (req, res, next) => {
-    const promo = new Promo (
-        {
-            ...req.body
-        });
-    promo.save()
-        .then(() => res.status(201).json({message: 'Object save'}))
-        .catch(error => {res.status(400).json({error: error})});
-}
-
-
-const getPromo = (req, res, next) => {
-    const promos = Promo.find()
-        .then((promos) => {res.status(200).json(promos)})
-        .catch(error => {res.status(404).json({error: error})});
-}
-
-const getPromoById = (req, res, next) => {
-    const promo = Promo.findOne({_id: req.params.id})
-        .then((promo) => {res.status(200).json(promo)})
-        .catch(error => {res.status(404).json({error: error})});
-}
-
-/*
-const getIdPromoByName = (req, res, next) => {
-    const promo = Promo.findOne({ name: req.params.name})
-        .then((promo) => {res.status(200).json(promo)})
-        .catch(error => {res.status(404).json({error: error})});
-}
-
- */
-
-module.exports = {addStudentToPromo, getPromo, getPromoById, } // getIdPromoByName
+module.exports = {addStudentToPromo, getPromos, getPromoById, getPromoByName, getIdPromoByName, deleteStudentToPromo}

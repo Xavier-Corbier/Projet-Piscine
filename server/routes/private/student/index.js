@@ -3,9 +3,11 @@ const router = express.Router();
 const studentController = require('../../../controllers/studentController')
 
 router.post('/', require('./createStudent')); // create
-router.get('/', studentController.getStudent); // read
-router.get('/:id', studentController.getStudentById);
-router.put('/:id', studentController.updateStudent) // update
-router.delete('/:id', studentController.deleteStudent) // delete
+router.put('/:id', require('./updateStudent')); // update
+router.put('/addGroup/:id', require('./addGroupToStudent'))
+router.delete('/:id', require('./deleteStudent')); // delete
+
+router.get('/', require('./getAllStudents')); // read
+router.get('/:id', require('./getStudentById'));
 
 module.exports = router;
