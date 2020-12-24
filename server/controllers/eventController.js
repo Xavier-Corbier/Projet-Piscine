@@ -1,16 +1,17 @@
 const Event = require('../models/Event');
 
 module.exports.addEvent = (req, res, next) => {
-    const body = req.body
+    const body = req.body;
     const event = new Event({
         name: body.name,
         slotDuration: body.slotDuration,
-        bookingDeadline: new Date(body.bookingDeadline),
+        bookingDeadline: body.bookingDeadline,
         maxStudentNumber: body.maxStudentNumber,
         maxJuryNumber: body.maxJuryNumber,
-        startDate: new Date(body.startDate),
-        endDate: new Date(body.endDate),
-        promo: body.promo
+        startDate: body.startDate,
+        endDate: body.endDate,
+        promo: body.promo,
+        slotList: ["5fe3adc63d08c327858651f1"]
     });
     event.save()
         .then(() => res.status(201).json({ message: 'Event ' + body.name + ' créé !' }))
@@ -34,6 +35,6 @@ module.exports.updateEvent = (req, res, next) => {
 module.exports.deleteEvent = (req, res, next) => {
     Event.deleteOne({ _id: req.params.id })
         .then((event) => res.status(200).json({ message: 'L\'event d\'id ' + req.params.id + ' a été supprimé.'}))
-        .catch((error) => res.status(500).json({ message: 'Erreur lors de la supression de l\'event d\'id '
+        .catch((error) => res.status(500).json({ message: 'Erreur lors de la suppression de l\'event d\'id '
         + req.params.id, err: error }));
 };
