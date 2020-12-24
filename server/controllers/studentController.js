@@ -11,7 +11,7 @@ module.exports.addStudent = (req, res, next) => {
         promo: req.body.promo,
         email: req.body.email,
         password: req.body.password
-         // à utiliser avec attention, on doit se mettre d'accord sur ce qu'il y a dans le corps de la req
+        // à utiliser avec attention, on doit se mettre d'accord sur ce qu'il y a dans le corps de la req
     });
     student.save()
         .then(() => res.status(201).json({ message: 'Objet enregistré !'}))
@@ -26,6 +26,7 @@ module.exports.getStudent = (req, res, next) => {
 
 module.exports.updateStudent = (req, res, next) => {
     // TODO
+
 };
 
 module.exports.deleteStudent = (req, res, next) => {
