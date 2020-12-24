@@ -67,4 +67,11 @@ const getIdPromoByName = async (name) => {
 }
 
 
-module.exports = {addStudentToPromo, getPromos, getPromoById, getPromoByName, getIdPromoByName, deleteStudentToPromo}
+module.exports = {
+    addStudentToPromo,
+    getPromos,
+    getPromoById,
+    getPromoByName,
+    getIdPromoByName,
+    deleteStudentToPromo
+}

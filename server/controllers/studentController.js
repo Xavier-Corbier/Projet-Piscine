@@ -3,20 +3,20 @@ const bcrypt = require('bcrypt');
 const Student = require('../models/Student');
 // CRUD
 
-module.exports.addStudent = async (studentObject) => {
+module.exports.addStudent = async (studentNumber, firstname, lastname, promo, email, password) => {
     try {
-        const hash = await bcrypt.hash(studentObject.password, 10);
+        const hash = await bcrypt.hash(password, 10); //faire une fonction avec fonction compare "encryption"
         const student = new Student({
-            studentNumber: studentObject.studentNumber,
-            firstname: studentObject.firstname,
-            lastname: studentObject.lastname,
-            promo: studentObject.promo,
-            email: studentObject.email,
+            studentNumber: studentNumber,
+            firstname: firstname,
+            lastname: lastname,
+            promo: promo,
+            email: email,
             password: hash
         });
         return await student.save();
     }catch (error){
-        console.log(error.message);
+        console.log(error);
         throw error;
     }
 };
@@ -28,7 +28,7 @@ module.exports.addGroupToStudent = async (idStudent, idGroup) => {
     }catch (e) {
         console.log(e.message);
     }
-}
+};
 
 module.exports.updateStudent = async (idStudent, studentObject) => {
     try {
@@ -49,7 +49,7 @@ module.exports.deleteStudent = async (idStudent) => {
 
 module.exports.getAllStudents = async () => { //renvoie la liste de tout les étudiants
     try{
-        return await Student.find();
+        return await Student.find().select('-password');
     }catch (e) {
         console.log(e.message);
     }
@@ -57,7 +57,7 @@ module.exports.getAllStudents = async () => { //renvoie la liste de tout les ét
 
 module.exports.getStudentById = async (idStudent) => { //renvoie une étudiant selon son id
     try{
-        return await Student.findOne({ _id: idStudent})
+        return await Student.findOne({ _id: idStudent}).select('-password');
     }catch (e) {
         console.log(e.message);
     }
@@ -66,7 +66,23 @@ module.exports.getStudentById = async (idStudent) => { //renvoie une étudiant s
 module.exports.getStudentByName = async (name) => { //renvoie une étudiant selon son nom et prenom
     //prendre en compte que deux étudiants peuvent avoir les mêmes noms et prénoms
     try{
-        return await Student.findOne({ name: name});
+        return await Student.findOne({ name: name}).select('-password');
+    }catch (e) {
+        console.log(e.message);
+    }
+};
+
+module.exports.getStudentByEmail = async (email) => {
+    try{
+        return await Student.findOne({email: email});
+    }catch (e) {
+        console.log(e.message);
+    }
+};
+
+module.exports.getStudentByNumber = async (number) => {
+    try{
+        return await Student.findOne({numberStudent: number}).select('-password');
     }catch (e) {
         console.log(e.message);
     }
