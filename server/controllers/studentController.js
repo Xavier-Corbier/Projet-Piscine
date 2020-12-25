@@ -1,11 +1,10 @@
-const bcrypt = require('bcrypt');
-
 const Student = require('../models/Student');
+const passwordEncryption = require('../encryption/passwordEncryption');
 // CRUD
 
-module.exports.addStudent = async (studentNumber, firstname, lastname, promo, email, password) => {
+const addStudent = async (studentNumber, firstname, lastname, promo, email, password) => {
     try {
-        const hash = await bcrypt.hash(password, 10); //faire une fonction avec fonction compare "encryption"
+        const hash = await passwordEncryption.passwordEncryption(password);
         const student = new Student({
             studentNumber: studentNumber,
             firstname: firstname,
@@ -21,25 +20,23 @@ module.exports.addStudent = async (studentNumber, firstname, lastname, promo, em
     }
 };
 
-module.exports.addGroupToStudent = async (idStudent, idGroup) => {
+const addGroupToStudent = async (idStudent, idGroup) => {
     try{
-        await Student.updateOne({_id: idStudent}, {group: idGroup, _id: idStudent});
-        return await Student.findOne({_id: idStudent});
+        return await Student.updateOne({_id: idStudent}, {group: idGroup, _id: idStudent}, {new: true}).select("-password");
     }catch (e) {
         console.log(e.message);
     }
 };
 
-module.exports.updateStudent = async (idStudent, studentObject) => {
+const updateStudent = async (idStudent, studentObject) => {
     try {
-        await Student.updateOne({_id: idStudent}, {...studentObject, _id: idStudent});
-        return await Student.findOne({_id: idStudent});
+        return await Student.findOneAndUpdate({_id: idStudent}, {...studentObject, _id: idStudent},{new: true}).select("-password");
     }catch (e) {
         console.log(e.message);
     }
 };
 
-module.exports.deleteStudent = async (idStudent) => {
+const deleteStudent = async (idStudent) => {
     try{
         return await Student.deleteOne({ _id: idStudent});
     }catch (e) {
@@ -47,7 +44,7 @@ module.exports.deleteStudent = async (idStudent) => {
     }
 };
 
-module.exports.getAllStudents = async () => { //renvoie la liste de tout les étudiants
+const getAllStudents = async () => { //renvoie la liste de tout les étudiants
     try{
         return await Student.find().select('-password');
     }catch (e) {
@@ -55,7 +52,7 @@ module.exports.getAllStudents = async () => { //renvoie la liste de tout les ét
     }
 };
 
-module.exports.getStudentById = async (idStudent) => { //renvoie une étudiant selon son id
+const getStudentById = async (idStudent) => { //renvoie une étudiant selon son id
     try{
         return await Student.findOne({ _id: idStudent}).select('-password');
     }catch (e) {
@@ -63,7 +60,7 @@ module.exports.getStudentById = async (idStudent) => { //renvoie une étudiant s
     }
 };
 
-module.exports.getStudentByName = async (name) => { //renvoie une étudiant selon son nom et prenom
+const getStudentByName = async (name) => { //renvoie une étudiant selon son nom et prenom
     //prendre en compte que deux étudiants peuvent avoir les mêmes noms et prénoms
     try{
         return await Student.findOne({ name: name}).select('-password');
@@ -72,7 +69,7 @@ module.exports.getStudentByName = async (name) => { //renvoie une étudiant selo
     }
 };
 
-module.exports.getStudentByEmail = async (email) => {
+const getStudentByEmail = async (email) => {
     try{
         return await Student.findOne({email: email});
     }catch (e) {
@@ -80,7 +77,7 @@ module.exports.getStudentByEmail = async (email) => {
     }
 };
 
-module.exports.getStudentByNumber = async (number) => {
+const getStudentByNumber = async (number) => {
     try{
         return await Student.findOne({numberStudent: number}).select('-password');
     }catch (e) {
@@ -95,3 +92,13 @@ module.exports.removeCollection = (req, res, next) => {
         .catch(error => {res.status(404).json({error: error})})
 }
 */
+module.exports = {
+    addStudent,
+    addGroupToStudent,
+    updateStudent,
+    getStudentById,
+    getAllStudents,
+    getStudentByNumber,
+    getStudentByEmail,
+    deleteStudent
+};

@@ -23,7 +23,7 @@ const addStudentToPromo = async (idPromo, idStudent) => {
 const deleteStudentToPromo = async (idPromo, idStudent) => {
     try {
         console.log(idPromo, idStudent);
-        return await Promo.findByIdAndUpdate({_id: idPromo}, {$pull: {studentList: idStudent}})
+        return await Promo.findOneAndUpdate({_id: idPromo}, {$pull: {studentList: idStudent}})
     }catch (error) {
         console.log(error.message);
         throw error;

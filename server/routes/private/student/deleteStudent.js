@@ -3,7 +3,7 @@ const promoController = require('../../../controllers/promoController');
 
 module.exports = async (req, res, next) => {
     try {
-        const idStudent = req.params.id;
+        const idStudent = req.query.id;
         const student = await studentController.getStudentById(idStudent);
         const studentPromo = await promoController.getPromoByName(student.promo);
         const promo = await promoController.deleteStudentToPromo(studentPromo.id, student.id);
@@ -11,7 +11,7 @@ module.exports = async (req, res, next) => {
         if(!student || !promo){
             return res.status(400).json({error: "Suppression échouée"});
         }else {
-            return res.status(200).json(student);
+            return res.status(200).json({message : "Suppression réussie"});
         }
     }catch(e){
         console.log(e.message);

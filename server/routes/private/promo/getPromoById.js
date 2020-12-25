@@ -2,7 +2,7 @@ const promoController = require('../../../controllers/promoController');
 
 module.exports = async (req, res, next) => {
     try{
-        const promo = await promoController.getPromoById(req.params.id);
+        const promo = await promoController.getPromoById(req.query.id);
         if(!promo){
             return res.status(400).json({error: "Aucune promo"});
         }else {
