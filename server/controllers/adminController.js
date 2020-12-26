@@ -4,7 +4,7 @@ const passwordEncryption = require('../encryption/passwordEncryption');
 
 const addAdmin = async (firstname, lastname, email, password) => {
     try {
-        const hash = await passwordEncryption.passwordEncryption(password);
+        const hash = await passwordEncryption(password);
         const admin = new Admin({
             firstname: firstname,
             lastname: lastname,
@@ -50,11 +50,21 @@ const getAdminByEmail = async (email) => {
     }
 };
 
+const updatePassword = async (mail, newPassword) => {
+    try {
+        const hash = await passwordEncryption((newPassword));
+        return await Admin.findOneAndUpdate({mail: mail}, {password: hash}, {new: true}).select('-password');
+    }catch (e) {
+        console.log(e.message);
+    }
+}
+
 
 module.exports =  {
     addAdmin,
     updateAdmin,
     deleteAdmin,
     getAdmin,
-    getAdminByEmail
+    getAdminByEmail,
+    updatePassword
 };

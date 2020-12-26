@@ -34,6 +34,7 @@ module.exports = async (req, res, next) => {
             return res.status(400).json({error : "Cet email est déjà utilisé"});
         }
         const studentExistNumber = await studentController.getStudentByNumber(studentNumber);
+        console.log(studentExistNumber);
         if (studentExistNumber){
             return res.status(400).json({error : "Ce numéro étudiant est déjà utilisé"});
         }

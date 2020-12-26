@@ -10,6 +10,7 @@ module.exports = async (req, res , next) => {
             const decodedToken = jwt.verify(bearerToken, process.env.tokenkey);
             const userId = decodedToken.id;
             const isAdmin = decodedToken.isAdmin;
+            console.log(isAdmin);
             if (!isAdmin ) {
                 console.log("Impossible d'accéder à cette page protégée");
                 res.status(403).json({ error : "Impossible d'accéder à cette page protégée"});

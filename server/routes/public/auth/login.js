@@ -54,8 +54,7 @@ module.exports = async (req, res, next) => {
                     console.log({adminToken});
                     return res.status(200).json(adminToken);
                 }else {
-                    console.log('mot de passe incorrect');
-                    return res.status(401).json({error: 'mot de passe incorrect'});
+                    return res.status(401).json({error: 'Mot de passe incorrect'});
                 }
             }
             //if is student
@@ -64,7 +63,7 @@ module.exports = async (req, res, next) => {
                 const studentToken = await userToken(student, false);
                 return res.status(200).json(studentToken);
             } else {
-                console.log('mot de passe incorrect');
+                console.log('Mot de passe incorrect');
                 return res.status(401).json({error: 'mot de passe incorrect'});
             }
         }
