@@ -10,7 +10,7 @@ module.exports = async (req, res , next) => {
             const decodedToken = jwt.verify(bearerToken, process.env.tokenkey);
             const userId = decodedToken.id;
             const isAdmin = decodedToken.isAdmin;
-            if (req.query.id && req.query.id.toString() !== userId.toString() || isAdmin ) {
+            if ((req.query.id && req.query.id.toString() !== userId.toString()) || !isAdmin ) {
                 console.log("Impossible d'accéder à cette page protégée");
                 res.status(403).json({ error : "Impossible d'accéder à cette page protégée"});
                 return false;
@@ -20,10 +20,9 @@ module.exports = async (req, res , next) => {
             }
         } else {
             console.log("Aucun token");
-            res.send({status : 401,message : "Aucun token"})
+            res.status(401).json({message : "Aucun token"})
         }
     }catch(error) {
-        console.log("try / catch ");
-        res.send({status: 403, message: "Bad news token wrong"});
+        res.status(401).json({message: "Unauthorized"});
     }
 };

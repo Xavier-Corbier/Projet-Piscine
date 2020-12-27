@@ -4,7 +4,7 @@ const passwordEncryption = require('../encryption/passwordEncryption');
 
 const addStudent = async (studentNumber, firstname, lastname, promo, email, password) => {
     try {
-        const hash = await passwordEncryption.passwordEncryption(password);
+        const hash = await passwordEncryption(password);
         const student = new Student({
             studentNumber: studentNumber,
             firstname: firstname,
@@ -79,11 +79,20 @@ const getStudentByEmail = async (email) => {
 
 const getStudentByNumber = async (number) => {
     try{
-        return await Student.findOne({numberStudent: number}).select('-password');
+        return await Student.findOne({studentNumber: number}).select('-password');
     }catch (e) {
         console.log(e.message);
     }
 };
+
+const updatePassword = async (email, newPassword) => {
+    try {
+        const hash = await passwordEncryption((newPassword));
+        return await Student.findOneAndUpdate({email: email}, {password: hash}, {new: true}).select('-password');
+    }catch (e) {
+        console.log(e.message);
+    }
+}
 
 /*
 module.exports.removeCollection = (req, res, next) => {
@@ -100,5 +109,6 @@ module.exports = {
     getAllStudents,
     getStudentByNumber,
     getStudentByEmail,
-    deleteStudent
+    deleteStudent,
+    updatePassword
 };
