@@ -2,12 +2,16 @@ const express = require('express');
 const router = express.Router();
 const studentController = require('../../../controllers/studentController')
 
-router.post('/', require('./createStudent')); // create
-router.put('/:id', require('./updateStudent')); // update
-router.put('/addGroup/:id', require('./addGroupToStudent'))
-router.delete('/:id', require('./deleteStudent')); // delete
+// update
+router.put('/', require('./updateStudent'));
+router.put('/addGroup/:id', require('./addGroupToStudent'));
+router.put('/updatePassword', require('./updatePassword'));
 
-router.get('/', require('./getAllStudents')); // read
-router.get('/:id', require('./getStudentById'));
+router.delete('/', require('./deleteStudent')); // delete
+router.get('/', require('./getStudentById'));
+
+
+//Reserved for admin
+router.get('/allStudents', require('../../../middleware/adminAuth') , require('./getAllStudents')); // read
 
 module.exports = router;

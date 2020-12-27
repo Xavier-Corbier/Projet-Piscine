@@ -2,11 +2,10 @@ const express = require('express');
 const router = express.Router();
 const promoController = require('../../../controllers/promoController')
 
-
+//Reserved for admin
 router.get('/',require('./getPromos'));
-router.get('/:id',require('./getPromoById'));
-router.get('/byName/:id',require('./getPromoByName'));
-router.get('/students/:id',require('./getStudentsToPromo'));
-//router.get('/idbyname/:id',promoController.getIdPromoByName);
+router.get('/byId',require('./getPromoById'));
+router.get('/byName',require('./getPromoByName'));
+router.get('/students',require('./getStudentsToPromo'));
 
 module.exports = router;

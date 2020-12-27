@@ -14,6 +14,6 @@ module.exports = async (req, res, next) => {
         }
     }catch(e){
         console.log(e.message);
-        return res.status(500).json({error: "Impossible d'ajouter cet élève"});
+        return res.status(500).json({error: e.name});
     }
 }

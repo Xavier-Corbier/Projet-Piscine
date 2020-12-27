@@ -3,7 +3,7 @@ const promoController = require('../../../controllers/promoController');
 
 module.exports = async (req, res, next) => {
     try{
-        const idPromo = req.params.id;
+        const idPromo = req.query.id;
         const promo = await promoController.getPromoById(idPromo);
         const studentIdList = promo.studentList;
         let i = 0;
