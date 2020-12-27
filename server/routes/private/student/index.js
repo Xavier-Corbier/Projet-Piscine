@@ -6,7 +6,6 @@ const studentController = require('../../../controllers/studentController')
 router.put('/', require('./updateStudent'));
 router.put('/addGroup/:id', require('./addGroupToStudent'));
 router.put('/updatePassword', require('./updatePassword'));
-
 router.delete('/', require('./deleteStudent')); // delete
 router.get('/', require('./getStudentById'));
 

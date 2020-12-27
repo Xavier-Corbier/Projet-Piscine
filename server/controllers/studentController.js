@@ -1,5 +1,7 @@
 const Student = require('../models/Student');
 const passwordEncryption = require('../encryption/passwordEncryption');
+
+
 // CRUD
 
 const addStudent = async (studentNumber, firstname, lastname, promo, email, password) => {
@@ -93,6 +95,7 @@ const updatePassword = async (email, newPassword) => {
         console.log(e.message);
     }
 }
+
 
 /*
 module.exports.removeCollection = (req, res, next) => {
