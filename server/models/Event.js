@@ -2,10 +2,12 @@ const mongoose = require("mongoose");
 
 const eventSchema = mongoose.Schema({
     name: { type: String, required: true, unique: true},
-    slotDuration: { type: Number, required: true },
-    bookingDeadline: { type: Date, required: true },
+    color: { type: String, required: true, unique: true},
     maxStudentNumber: { type: Number, required: true },
     maxJuryNumber: { type: Number, required: true },
+    slotDuration: { type: Number, required: true },
+    breakDuration: {type: Number, required: true},
+    bookingDeadline: { type: Date, required: true },
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
     promo: { type: String, required: true },
