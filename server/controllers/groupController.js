@@ -1,46 +1,112 @@
 const Group = require('../models/Group');
-const groupController = require('./groupController');
 // CRUD
 
-module.exports.addGroup = (req, res, next) => {
-    // TODO
-    const group = new Group({
-        ...req.body
-    });
+const createGroup = async (groupObject) => { //Crée un groupe avec au minimum un nom de groupe, une liste d'étudiant et un enseignant.
+    try {
+        const group = new Group({
+            ...groupObject,
+            studentList: [],
+        });
 
-    group.save()
-        .then(() => res.status(201).json({ message: 'Objet enregistré !'}))
-        .catch(error => res.status(400).json({ error }));
+        return await group.save();
+    }catch (error){
+        console.log(error);
+        throw error;
+    }
 };
 
-module.exports.getGroup = (req, res, next) => {
-    const groups = Group.find()
-        .then((groups) => {res.status(200).json(groups)})
-        .catch(error => {res.status(404).json({error: error})});
+
+const getGroup = async() => { // Renvoie la liste de tout les groupes
+    try {
+        return await Group.find();
+    }catch (error) {
+        console.log(error.message);
+        throw error;
+    }
+};
+
+const updateGroup = async (id,groupObject) => {
+    try {
+        return await Group.findOneAndUpdate( { _id: id}, {_id: id, ...groupObject}, {new:true}); // Modifie un groupe (tout ses attributs), on modifie cet groupe de part son id (_id)
+    }catch (error) {
+        console.log(error.message);
+        throw error;
+    }
 }
 
-module.exports.updateGroup = (req, res, next) => {
-    // TODO
-    const groups =Group.updateOne({ _id: req.params.id }, {$set : {...req.body, _id: req.params.id }})
-        .then(() => res.status(200).json({ message: 'Objet modifié !'}))
-        .catch(error => res.status(400).json({ error }));
-};
-
-module.exports.deleteGroup = (req, res, next) => {
-    // TODO
-    const groups = Group.deleteOne({ _id: req.params.id})
-        .then(() => res.status(200).json({ message: 'Objet supprimé !'}))
-        .catch(error => res.status(400).json({ error }));
-};
-
-module.exports.getGroupById = (req, res, next) => { //renvoie une étudiant selon son id
-    const groups = Group.findOne({ _id: req.params.id})
-        .then((groups) => {res.status(200).json(groups)})
-        .catch(error => {res.status(404).json({error: error})});
+const deleteGroup = async (id) => {
+    try {
+        return await Group.findByIdAndDelete({_id: id});  // Supprime un groupe(tout ses attributs), on le supprime de part son id(_id)
+    }catch (error) {
+        console.log(error.message);
+        throw error;
+    }
+}
+const getGroupById = async(idGroup) => {
+    try {
+        return await Group.findOne({_id: idGroup});
+    }catch (error) {
+        console.log(error.message);
+        throw error;
+    }
 }
 
-module.exports.getIdGroupByStudent = (req, res, next) => {
-    const groups = Group.findOne({ studentList: req.params.studentList})
-        .then((groups) => {res.status(200).json(groups)})
-        .catch(error => {res.status(404).json({error: error})});
+/*
+const getGroupByStudent = async (studentList) => {
+    try {
+        return await Group.findOne({studentList: studentList});
+    }catch (e) {
+        console.log(e.messagenodem);
+    }
+}
+*/
+
+
+const addSlotToGroup = async(id, idSlot) => {
+    try{
+        return await Group.findByIdAndUpdate({_id: id}, {$push: {slot: idSlot}}, {new:true});
+    }catch (error) {
+        console.log(error.message);
+        throw error;
+    }
 };
+
+const addStudentToGroup = async (id, idStudent) => {
+    try {
+        return await Group.findByIdAndUpdate({_id: id}, {$push: {studentList: idStudent}},{new:true});
+    }catch (error) {
+        console.log(error.message);
+        throw error;
+    }
+}
+
+
+const deleteSlotOfGroup = async (id, idSlot) => {
+    try {
+        return await Group.findOneAndUpdate({_id: id}, {$pull: {slot: idSlot}});
+    }catch (error) {
+        console.log(error.message);
+        throw error;
+    }
+}
+
+const deleteStudentOfGroup = async (id, idStudent) => {
+    try {
+        return await Group.findOneAndUpdate({_id: id}, {$pull: {studentList: idStudent}});
+    }catch (error) {
+        console.log(error.message);
+        throw error;
+    }
+}
+
+module.exports = {
+    createGroup, //ok
+    getGroup, //ok
+    updateGroup, //ok
+    deleteGroup, // ok?
+    getGroupById, //ok
+    addSlotToGroup,
+    addStudentToGroup, //ok?
+    deleteSlotOfGroup,
+    deleteStudentOfGroup, // ok?
+}
