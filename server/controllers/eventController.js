@@ -30,14 +30,30 @@ module.exports.createEvent = async (eventObject) => {
  */
 const addSlotToEvent = async (eventId, slotId) => {
     try {
-        Slot.updateOne({ _id: slotId }, { event: eventId });
+        Slot.updateOne({ _id: slotId }, { eventId: eventId });
         return await Event.updateOne({ _id: eventId }, { $push: { slotList: slotId } }, {new: true});
     } catch (error) {
-        console.log(error);
+        console.error(error);
         throw error;
     }
 };
 module.exports.addSlotToEvent = addSlotToEvent;
+
+/**
+ *
+ * @param eventId
+ * @param slotId
+ * @returns {Promise<void>}
+ */
+module.exports.removeSlotFromEvent = async (eventId, slotId) => {
+    try {
+        Slot.updateOne({ _id: slotId }, { event: eventId });
+        return await Event.updateOne({ _id: eventId }, { $pull: { slotList: slotId } }, {new: true});
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
 
 /**
  * Remplit automatiquement un event avec des slots. Les weekends sont ignorés.
@@ -66,8 +82,10 @@ module.exports.populateEventWithSlots = async function (eventObject) {
             break;
         }
 
+        // on réinitialise l'heure pour chaque nouveau jour
         d.setHours(startDate.getHours());
         d.setMinutes(startDate.getMinutes());
+
         for (let i = 1; i <= 6; i++) {
             let slot = await slotController.createSlot(eventId, d);
             await addSlotToEvent(eventId, slot._id);
@@ -95,7 +113,7 @@ module.exports.getEventById = async (eventId) => {
     try {
         return await Event.findOne({ _id: eventId });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         throw error;
     }
 };
@@ -108,7 +126,7 @@ module.exports.getAllEvents = async () => {
     try {
         return await Event.find();
     } catch (error) {
-        console.log(error);
+        console.error(error);
         throw error;
     }
 };
@@ -123,7 +141,7 @@ module.exports.updateEventById = async (eventId, newEvent) => {
   try {
       return await Event.findOneAndUpdate({ _id: eventId }, { _id: eventId, ...newEvent }, { new: true });
   } catch (error) {
-      console.log(error);
+      console.error(error);
       throw error;
   }
 };
@@ -137,7 +155,7 @@ module.exports.deleteEventById = async (eventId) => {
     try {
         return await Event.findByIdAndDelete(eventId);
     } catch (error) {
-        console.log(error);
+        console.error(error);
         throw error;
     }
 };
