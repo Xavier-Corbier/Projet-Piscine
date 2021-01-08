@@ -4,32 +4,10 @@ const regEmail = /^[a-z-]{3,20}\.[a-z]{3,20}[0-9]{0,3}@(etu.)?(umontpellier.fr)$
 const jwt = require('jsonwebtoken');
 const studentController = require('../../../controllers/studentController');
 const adminController = require('../../../controllers/adminController');
+const token = require('../../../encryption/token');
 const bcrypt = require('bcrypt');
 
-const userToken = async (user, isAdmin) => {
-    try {
-        //if password compare is true, we return token
-        const tokenUser = {
-            id: user._id,
-            email: user.email,
-            firstName: user.firstName,
-            isAdmin: isAdmin,
-        };
-        const token = jwt.sign(tokenUser, process.env.tokenkey, {expiresIn: '200000h'});
-        const myReturn = {
-            success: true,
-            message: 'Connected !',
-            token: token,
-            firstName: user.firstname,
-            userId: user._id,
-            isAdmin: isAdmin
-        };
-        console.log({myReturn})
-        return myReturn;
-    }catch (error) {
-        console.log(error);
-    }
-};
+
 
 module.exports = async (req, res, next) => {
     try {
@@ -39,31 +17,37 @@ module.exports = async (req, res, next) => {
             return res.status(400).json({error: "Aucun email saisi"});
         } else if (!password) {
             return res.status(400).json({error: "Aucun mot de passe saisi"});
-        } else if (!email.toLowerCase().match(regEmail)) {
+        }
+        //vérification de la conformité de l'email
+        const correctEmail = email.toLowerCase().trim();
+        if (!correctEmail.match(regEmail)) {
             return res.status(400).json({error: "Format de l'email incorrect"});
         } else {
-            const student = await studentController.getStudentByEmail(email.toLowerCase());
-            if (!student) {
-                const admin = await adminController.getAdminByEmail(email.toLowerCase());
-                if (!admin) {
+            //on regarde si l'email correspond à un de nos étudiants inscrit
+            const student = await studentController.getStudentByEmail(correctEmail);
+            if (!student) { //aucun étudiant n'est trouvé, on regarde s'il s'agit de l'administrateur qui souhaite se connecter
+                const admin = await adminController.getAdminByEmail(correctEmail);
+                if (!admin) { //l'email n'est pas dans notre base de données
                     return res.status(401).json({error: "Cet email n'est pas dans notre base de données, essayez de vous inscrire."});
                 }
-                //if is admin
+                //l'email correspond à l'admin : on vérifie si le mot de passe est correcte
                 const match = await bcrypt.compare(password, admin.password.toString());
                 if (match) {
-                    const adminToken = await userToken(admin, true);
+                    //Les informations sont correctes : on créer le token
+                    const adminToken = await token.createUserToken(admin, true);
                     console.log({adminToken});
                     return res.status(200).json(adminToken);
-                }else {
+                }else { //le mot de passe est faux
                     return res.status(401).json({error: 'Mot de passe incorrect'});
                 }
             }
-            //if is student
+            //l'email correspond à un étudiant : vérification du mot de passe
             const match = await bcrypt.compare(password, student.password.toString());
             if (match) {
-                const studentToken = await userToken(student, false);
+                //Les informations sont correctes : on créer le token
+                const studentToken = await token.createUserToken(student, false);
                 return res.status(200).json(studentToken);
-            } else {
+            } else { //le mot de passe est faux
                 console.log('Mot de passe incorrect');
                 return res.status(401).json({error: 'mot de passe incorrect'});
             }

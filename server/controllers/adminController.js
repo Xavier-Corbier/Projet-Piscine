@@ -19,8 +19,9 @@ const addAdmin = async (firstname, lastname, email, password) => {
 };
 
 const updateAdmin = async (idAdmin, firstname, lastname, email) => {
+    //modification du prenom, nom ou email, retourne l'admin modifié
     try {
-        return await Admin.updateOne({_id: idAdmin}, {firstname, lastname, email, _id: idStudent}, {new: true}).select("-password");
+        return await Admin.updateOne({_id: idAdmin}, {firstname, lastname, email, _id: idAdmin}, {new: true}).select("-password");
     }catch (e) {
         console.log(e.message);
     }
@@ -43,6 +44,7 @@ const getAdmin = async () => {
 };
 
 const getAdminByEmail = async (email) => {
+    //fonction utilisée pour le login : retourne l'admin par son email, avec le mot de passe pour les vérifications
     try{
         return await Admin.findOne({email: email});
     }catch (e) {
@@ -51,8 +53,9 @@ const getAdminByEmail = async (email) => {
 };
 
 const updatePassword = async (mail, newPassword) => {
+    //modification du mot de passe, retourne l'admin mofifié : la modification ne se voit pas sur le retour puisque on ne renvoi pas le mot de passe
     try {
-        const hash = await passwordEncryption((newPassword));
+        const hash = await passwordEncryption((newPassword)); //hachage du mot de passe
         return await Admin.findOneAndUpdate({mail: mail}, {password: hash}, {new: true}).select('-password');
     }catch (e) {
         console.log(e.message);

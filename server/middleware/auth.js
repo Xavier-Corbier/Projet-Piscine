@@ -10,8 +10,6 @@ module.exports = async (req, res , next) => {
             const decodedToken = jwt.verify(bearerToken, process.env.tokenkey);
             const userId = decodedToken.id;
             const isAdmin = decodedToken.isAdmin;
-            console.log(userId, req.query.id);
-            console.log(isAdmin);
             if ((req.query.id && req.query.id.toString() === userId.toString()) || isAdmin ) {
                 next();
                 return true;
