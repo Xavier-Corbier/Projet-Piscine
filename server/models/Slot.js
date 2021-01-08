@@ -1,10 +1,10 @@
 const mongoose = require("mongoose");
 
 const slotSchema = mongoose.Schema({
-    room: { type: String, required: true },
+    room: { type: String},
     date:  { type: Date, required: true }, // l'heure est comprise dans l'objet Date
-    event: { type: mongoose.Schema.Types.ObjectId, ref: 'Event', required: true },
-    group: { type: mongoose.Schema.Types.ObjectId, ref: 'Group'}
+    eventId: { type: mongoose.Schema.Types.ObjectId, ref: 'Event', required: true },
+    groupId: { type: mongoose.Schema.Types.ObjectId, ref: 'Group'}
     // Le slot n'a pas besoin du prof, il pourra le récupérer à partir du group
 });
 
