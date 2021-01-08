@@ -21,10 +21,9 @@ module.exports = async (req, res , next) => {
             }
         } else {
             console.log("Aucun token");
-            res.send({status : 401,message : "Aucun token"})
+            res.status(401).json({message : "Aucun token "})
         }
     }catch(error) {
-        console.log("try / catch ");
-        res.send({status: 403, message: "Bad news token wrong"});
+        res.status(401).json({message: "Unauthorized"});
     }
 };

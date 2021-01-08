@@ -20,12 +20,10 @@ app.use(cors()); // TODO: se documenter sur cors
 app.use(bodyParser.json());
 
 // Les requêtes qui ne passent pas par le middleware d'authentification sont redirigées vers le router public
-// TODO: implémenter le router public
 app.use("/api", require('./server/routes/public'));
 
 // Les requêtes qui passent par le middleware d'authentification sont redirigées vers le router privé
 app.use("/api", require('./server/middleware/auth'), require('./server/routes/private'));
-// TODO: implémenter le middleware d'auth
 
 /* Handling errors */
 app.use((req,res,next) => {

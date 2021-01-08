@@ -1,15 +1,20 @@
 const studentController = require('../../../controllers/studentController');
 const bcrypt = require('bcrypt');
+const regEmail = /^[a-z\-]{3,20}\.[a-z]{3,20}[0-9]{0,3}(@etu.umontpellier.fr)$/
 
 module.exports = async (req, res, next) => {
     try {
-        const {email, oldPassword, newPassword} = req.body;
-        const student = await studentController.getStudentByEmail(email);
+        const {email, oldPassword, newPassword, newPasswordConfirm} = req.body; //récupération des informations
+
+        const student = await studentController.getStudentByEmail(email.trim());
         if (!student) {
             return res.status(400).json({error: "Aucun étudiant"});
-        }else if (!newPassword) {
+        }else if (!newPassword || !newPasswordConfirm) {
             return res.status(400).json({error: "Pas de nouveau mot de passe saisi"});
-        }else {
+        }else if (newPassword !== newPasswordConfirm){
+            return res.status(400).json({error: "Les mots de passe saisis ne correspondent pas"});
+        }
+        else {
             const match = await bcrypt.compare(oldPassword, student.password.toString());
             if(!match){
                 return res.status(400).json({error: "Mot de passe incorrect"});
