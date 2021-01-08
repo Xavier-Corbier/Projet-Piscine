@@ -6,4 +6,5 @@ const teacherSchema = mongoose.Schema({
     slotList: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Slot'}]
 });
 
+
 module.exports = mongoose.model('Teacher', teacherSchema);
