@@ -1,11 +1,11 @@
 const jwt = require('jsonwebtoken');
 
-const token = async (req) => {
+const decodedToken = async (bearerHeader) => {
     try {
-        const token = req.headers["authorization"].split(" ")[1];
-        return jwt.decode(token);
+        const bearerToken = bearerHeader.split(" ")[1]; //récupération du token
+        const decodedToken = jwt.verify(bearerToken, process.env.tokenkey); //décodage du token
     } catch (error) {
-        console.log("erreur lors de la récupération du token ");
+        console.log("Erreur lors de la récupération du token ");
         return false;
     }
 }
@@ -13,14 +13,16 @@ const token = async (req) => {
 const createUserToken = async (user, isAdmin) => {
     //création d'un token pour les utilisateurs
     try {
-        //if password compare is true, we return token
+        //données cryptées dans le token
         const tokenUser = {
             id: user._id,
             email: user.email,
             firstName: user.firstName,
             isAdmin: isAdmin,
         };
+        //creation du token
         const token = jwt.sign(tokenUser, process.env.tokenkey, {expiresIn: '200000h'});
+        //retour
         const myReturn = {
             success: true,
             message: 'Connected !',
@@ -29,11 +31,10 @@ const createUserToken = async (user, isAdmin) => {
             userId: user._id,
             isAdmin: isAdmin
         };
-        console.log({myReturn})
         return myReturn;
     }catch (error) {
         console.log(error);
     }
 };
 
-module.exports = {createUserToken, token};
+module.exports = {createUserToken, decodedToken};

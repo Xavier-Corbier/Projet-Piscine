@@ -1,26 +1,22 @@
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
+const token = require('../encryption/token');
 
 module.exports = async (req, res , next) => {
     try {
         let bearerToken;
-        const bearerHeader = req.headers["authorization"];
+        const bearerHeader = req.headers["authorization"]; //récupération du header
         if (typeof bearerHeader !== 'undefined') {
-            const bearerToken = bearerHeader.split(" ")[1];
-            const decodedToken = jwt.verify(bearerToken, process.env.tokenkey);
-            const userId = decodedToken.id;
-            const isAdmin = decodedToken.isAdmin;
-            console.log(isAdmin);
-            if (!isAdmin ) {
-                console.log("Impossible d'accéder à cette page protégée");
+            const decodedToken = token.decodedToken(bearerHeader);//décodage du token
+            const isAdmin = decodedToken.isAdmin; //récupération du bool isAdmin stocké dans le token
+            if (!isAdmin ) { //il ne s'agit pas de l'admin
                 res.status(403).json({ error : "Impossible d'accéder à cette page protégée"});
                 return false;
-            } else {
+            } else { //il s'agit de l'admin : il peut accéder à la page
                 next();
                 return true;
             }
-        } else {
-            console.log("Aucun token");
+        } else { //aucun header trouvé
             res.status(401).json({message : "Aucun token "})
         }
     }catch(error) {

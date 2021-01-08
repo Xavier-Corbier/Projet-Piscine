@@ -160,6 +160,5 @@ module.exports = {
     deleteStudent,
     updatePassword,
     getStudentByPromo,
-    isPromo,
-    listPromo
+    isPromo
 };
