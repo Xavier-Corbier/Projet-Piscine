@@ -9,7 +9,8 @@ module.exports = async (req, res, next) => {
         if(!student){
             return res.status(400).json({error: "L'étudiant n'existe pas"});
         }else {
-            await studentController.deleteStudent(idStudent);
+            const sup = await studentController.deleteStudent(idStudent);
+            console.log(sup)
             return res.status(200).json({message : "Suppression réussie"});
         }
     }catch(e){

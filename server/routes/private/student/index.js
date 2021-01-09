@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const studentController = require('../../../controllers/studentController')
 
-router.put('/', require('./updateStudent'));
+router.put('/email', require('./updateEmailToStudent'));
+router.put('/promo', require('./updatePromoToStudent'));
 
 //fonction pour tester
-router.put('/addGroup/:id', require('./addGroupToStudent'));
-router.put('/addGroup/:id', require('./deleteGroupToStudent'));
+router.put('/addGroup', require('./addGroupToStudent'));
+router.put('/addGroup', require('./deleteGroupToStudent'));
 
 router.put('/updatePassword', require('./updatePassword'));
 router.delete('/', require('./deleteStudent')); // delete

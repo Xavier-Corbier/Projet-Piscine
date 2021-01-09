@@ -1,7 +1,16 @@
 const Admin = require('../models/Admin');
 const passwordEncryption = require('../encryption/passwordEncryption');
+const userFunctions = require('../userFunctions');
 // CRUD
 
+/**
+ * Ajoute un admin à la base de données
+ * @param firstname
+ * @param lastname
+ * @param email
+ * @param password
+ * @returns {Promise<Document>}
+ */
 const addAdmin = async (firstname, lastname, email, password) => {
     try {
         const hash = await passwordEncryption(password);
@@ -18,15 +27,36 @@ const addAdmin = async (firstname, lastname, email, password) => {
     }
 };
 
-const updateAdmin = async (idAdmin, firstname, lastname, email) => {
+/**
+ * Modification des propriétés de l'admin
+ * @param idAdmin : ObjectId
+ * @param firstname : String
+ * @param lastname : String
+ * @param email : String
+ * @returns {Promise<any>} du type
+ *  {
+	    "_id": ObjectId,
+	    "firstname": String,
+	    "lastname": String,
+	    "email": String,
+	    "__v": Int
+    }
+ */
+const updateAdmin = async (idAdmin, email) => {
     //modification du prenom, nom ou email, retourne l'admin modifié
     try {
-        return await Admin.updateOne({_id: idAdmin}, {firstname, lastname, email, _id: idAdmin}, {new: true}).select("-password");
+        const name = userFunctions.createNameByEmail(email);
+        return await Admin.findOneAndUpdate({_id: idAdmin}, {firstname: name[0], lastname: name[1], email: email, _id: idAdmin}, {new: true}).select("-password");
     }catch (e) {
         console.log(e.message);
     }
 };
 
+/**
+ * Supprime un admin de la base données
+ * @param idAdmin
+ * @returns {Promise<*>}
+ */
 const deleteAdmin = async (idAdmin) => {
     try{
         return await Admin.deleteOne({ _id: idAdmin});
@@ -35,6 +65,17 @@ const deleteAdmin = async (idAdmin) => {
     }
 };
 
+/**
+ * Retourne les informations de l'admin
+ * @returns {Promise<any>} du type:
+ * {
+	    "_id": ObjectId,
+	    "firstname": String,
+	    "lastname": String,
+	    "email": String,
+	    "__v": Int
+    }
+ */
 const getAdmin = async () => {
     try{
         return await Admin.find().select('-password');
@@ -43,8 +84,21 @@ const getAdmin = async () => {
     }
 };
 
+/**
+ * Retourne les informations de l'admin par son email
+ * @param email : String
+ * @returns {Promise<any>} du type
+ * {
+	    "_id": ObjectId,
+	    "firstname": String,
+	    "lastname": String,
+	    "email": String,
+	    "password": String
+	    "__v": Int
+    }
+ */
 const getAdminByEmail = async (email) => {
-    //fonction utilisée pour le login : retourne l'admin par son email, avec le mot de passe pour les vérifications
+    //fonction utilisée pour le login : retourne l'admin avec le mot de passe pour les vérifications
     try{
         return await Admin.findOne({email: email});
     }catch (e) {
@@ -52,11 +106,23 @@ const getAdminByEmail = async (email) => {
     }
 };
 
-const updatePassword = async (mail, newPassword) => {
-    //modification du mot de passe, retourne l'admin mofifié : la modification ne se voit pas sur le retour puisque on ne renvoi pas le mot de passe
+/**
+ * Modifie le mot de passe de l'admin
+ * @param mail : String
+ * @param newPassword : String
+ * @returns {Promise<any>} du type
+ * {
+	    "_id": ObjectId,
+	    "firstname": String,
+	    "lastname": String,
+	    "email": String,
+	    "__v": Int
+    }
+ */
+const updatePassword = async (email, newPassword) => {
     try {
         const hash = await passwordEncryption((newPassword)); //hachage du mot de passe
-        return await Admin.findOneAndUpdate({mail: mail}, {password: hash}, {new: true}).select('-password');
+        return await Admin.findOneAndUpdate({email: email}, {password: hash}, {new: true}).select('-password');
     }catch (e) {
         console.log(e.message);
     }

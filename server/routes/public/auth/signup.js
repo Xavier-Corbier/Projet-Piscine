@@ -32,7 +32,7 @@ module.exports = async (req, res, next) => {
             return res.status(400).json({error : "Ce numéro étudiant est déjà utilisé"});
         }
         //on vérifie si la promo est une promo valide
-        const correctPromo = promo.toUpperCase();
+        const correctPromo = promo.toUpperCase().trim();
         console.log(correctPromo);
         if (!studentController.isPromo(correctPromo)){
             return res.status(400).json({error : "La promo saisie n'existe pas"})

@@ -2,7 +2,7 @@ const studentController = require('../../../controllers/studentController');
 
 module.exports = async (req, res, next) => {
     try {
-        const idStudent = req.params.id;
+        const idStudent = req.query.id;
         const idGroup = req.body.idGroup;
         const student = await studentController.addGroupToStudent(idStudent, idGroup);
         if (!student){

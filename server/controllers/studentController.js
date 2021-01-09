@@ -1,20 +1,30 @@
 const Student = require('../models/Student');
 const passwordEncryption = require('../encryption/passwordEncryption');
-
+const userFunctions = require('../userFunctions');
 const listPromo = ["IG3","IG4","IG5","Ancien"]; //liste des promos valides
 
 // CRUD
 
-const createNameByEmail = (email) => {
-    //prend en parametre un email du type prenom.nom... et retourne dans un tableau le prenom et le nom
-    const PN = email.split('@')[0];
-    const prenom = PN.split('.')[0];
-    const nom = PN.split('.')[1].replace(new RegExp("[^(a-zA-Z)]", "g"), ''); //supprime les chiffres possibles
-    return [prenom, nom];
-}
+/**
+ * Ajoute un nouvel étudiant à la base de données
+ * @param studentNumber : Int
+ * @param promo : string
+ * @param email : string
+ * @param password : string
+ * @returns {Promise<Document>} du type :
+     {
+	    "_id": ObjectId,
+	    "studentNumber": Number,
+	    "firstname": String,
+	    "lastname": String,
+	    "promo": String,
+	    "email": String,
+	    "__v": Int
+    }
+ */
 const addStudent = async (studentNumber, promo, email, password) => {
     try {
-        const name = createNameByEmail(email); //creation du prenom et du nom
+        const name = userFunctions.createNameByEmail(email); //creation du prenom et du nom
         const firstname = name[0];
         const lastname = name[1];
         const hash = await passwordEncryption(password); //hachage du mot de passe
@@ -33,8 +43,23 @@ const addStudent = async (studentNumber, promo, email, password) => {
     }
 };
 
+/**
+ * Complète la propriété group de l'étudiant
+ * @param idStudent : ObjectId de l'étudiant concerné
+ * @param idGroup : ObjectId du groupe qu'il faut ajouter
+ * @returns {Promise<any>} du type :
+    {
+	    "_id": ObjectId,
+	    "studentNumber": Number,
+	    "firstname": String,
+	    "lastname": String,
+	    "promo": String,
+	    "email": String,
+	    "group": ObjectId,
+	    "__v": Int
+    }
+ */
 const addGroupToStudent = async (idStudent, idGroup) => {
-    //ajoute un group à l'étudiant, retourne l'étudiant modifié
     try{
         return await Student.updateOne({_id: idStudent}, {group: idGroup, _id: idStudent}, {new: true}).select("-password");
     }catch (e) {
@@ -42,8 +67,22 @@ const addGroupToStudent = async (idStudent, idGroup) => {
     }
 };
 
-const deleteGroupToStudent = async () => {
-    //supprime le group de l'étudiant, retourne l'étudiant modifié
+/**
+ * Supprime la propriété group de l'étudiant
+ * @param idStudent : ObjectId de l'étudiant concerné
+ * @param idGroup : ObjectId du groupe qu'il faut supprimer
+ * @returns {Promise<any>} du type
+    {
+	    "_id": ObjectId,
+	    "studentNumber": Number,
+	    "firstname": String,
+	    "lastname": String,
+	    "promo": String,
+	    "email": String,
+	    "__v": Int
+    }
+ */
+const deleteGroupToStudent = async (idStudent, idGroup) => {
     try{
         return await Student.updateOne({_id: idStudent}, {$unset: {group: idGroup}}, {new: true}).select("-password");
     }catch (e) {
@@ -51,18 +90,44 @@ const deleteGroupToStudent = async () => {
     }
 };
 
-
-const updateStudent = async (idStudent, studentObject) => {
-    //modification promo et/ou email
+/**
+ * Modification d'un étudiant
+ * @param idStudent :  ObjectId de l'étudiant concerné
+ * @param studentObject : nouvelles informations de l'étudiant
+ * @returns {Promise<any>} du type:
+    {
+	    "_id": ObjectId,
+	    "studentNumber": Number,
+	    "firstname": String,
+	    "lastname": String,
+	    "promo": String,
+	    "email": String,
+	    "__v": Int
+    }
+ */
+const updatePromoToStudent = async (idStudent, promo) => {
     try {
-        return await Student.findOneAndUpdate({_id: idStudent}, {...studentObject, _id: idStudent},{new: true}).select("-password");
+        return await Student.findOneAndUpdate({_id: idStudent}, {promo: promo, _id: idStudent},{new: true}).select("-password");
     }catch (e) {
         console.log(e.message);
     }
 };
 
+const updateEmailToStudent = async (idStudent, email) => {
+    try {
+        const name = userFunctions.createNameByEmail(email);
+        return await Student.findOneAndUpdate({_id: idStudent}, {firstname: name[0], lastname: name[1], email: email, _id: idStudent},{new: true}).select("-password");
+    }catch (e) {
+        console.log(e.message);
+    }
+};
+
+/**
+ * Supprime un étudiant par son id
+ * @param idStudent : ObjectId de l'étudiant concerné
+ * @returns {Promise<*>}
+ */
 const deleteStudent = async (idStudent) => {
-    //supprime un étudiant selon son id
     try{
         return await Student.deleteOne({ _id: idStudent});
     }catch (e) {
@@ -70,8 +135,23 @@ const deleteStudent = async (idStudent) => {
     }
 };
 
+/**
+ * Retourne tout les étudiants de la base de données
+ * @returns {Promise<any>} du type :
+ * [
+    {
+	    "_id": ObjectId,
+	    "studentNumber": Number,
+	    "firstname": String,
+	    "lastname": String,
+	    "promo": String,
+	    "email": String,
+	    "__v": Int
+    }
+    ...
+    ]
+ */
 const getAllStudents = async () => {
-    //renvoie la liste de tout les étudiants
     try{
         return await Student.find().select('-password');
     }catch (e) {
@@ -79,8 +159,21 @@ const getAllStudents = async () => {
     }
 };
 
+/**
+ * Retourne les informations d'un étudiant par son id
+ * @param idStudent : ObjectId de l'étudiant concerné
+ * @returns {Promise<any>} du type
+    {
+	    "_id": ObjectId,
+	    "studentNumber": Number,
+	    "firstname": String,
+	    "lastname": String,
+	    "promo": String,
+	    "email": String,
+	    "__v": Int
+    }
+ */
 const getStudentById = async (idStudent) => {
-    //renvoie un étudiant selon son id
     try{
         return await Student.findOne({ _id: idStudent}).select('-password');
     }catch (e) {
@@ -98,8 +191,23 @@ const getStudentByName = async (name) => {
     }
 };
 
+/**
+ * Retourne les informations d'un étudiant par son email
+ * @param email : String
+ * @returns {Promise<any>} du type :
+    {
+	    "_id": ObjectId,
+	    "studentNumber": Number,
+	    "firstname": String,
+	    "lastname": String,
+	    "promo": String,
+	    "email": String,
+	    "password": String,
+	    "__v": Int
+    }
+ */
 const getStudentByEmail = async (email) => {
-    //renvoi un étudiant selon son email : le mot de passe est aussi renvoyé ici car la fonction est utilisé pour la vérification lors de la connexion
+    //le mot de passe est aussi renvoyé ici car la fonction est utilisé pour la vérification lors de la connexion
     try{
         return await Student.findOne({email: email});
     }catch (e) {
@@ -107,6 +215,20 @@ const getStudentByEmail = async (email) => {
     }
 };
 
+/**
+ * Retourne les informations d'un étudiant par son numéro étudiant
+ * @param number : Number
+ * @returns {Promise<any>} du type :
+   {
+	    "_id": ObjectId,
+	    "studentNumber": Number,
+	    "firstname": String,
+	    "lastname": String,
+	    "promo": String,
+	    "email": String,
+	    "__v": Int
+    }
+ */
 const getStudentByNumber = async (number) => {
     //renvoi un étudiant selon son numéro étudiant
     try{
@@ -116,6 +238,23 @@ const getStudentByNumber = async (number) => {
     }
 };
 
+/**
+ * Retourne la liste des étudiants ayant comme promo la promo entré en paramètre
+ * @param promo : String correspondant à une promo valide
+ * @returns {Promise<any>} du type
+    [
+    {
+	    "_id": ObjectId,
+	    "studentNumber": Number,
+	    "firstname": String,
+	    "lastname": String,
+	    "promo": String,
+	    "email": String,
+	    "__v": Int
+    }
+    ...
+    ]
+ */
 const getStudentByPromo = async (promo) => {
     //renvoi la liste des étudiants appartenant à une promo précise
     try{
@@ -125,8 +264,22 @@ const getStudentByPromo = async (promo) => {
     }
 };
 
+/**
+ * Modification de la propriété "mot de passe" d'un étudiant par son email
+ * @param email : String
+ * @param newPassword : String
+ * @returns {Promise<any>} du type
+    {
+	    "_id": ObjectId,
+	    "studentNumber": Number,
+	    "firstname": String,
+	    "lastname": String,
+	    "promo": String,
+	    "email": String,
+	    "__v": Int
+    }
+ */
 const updatePassword = async (email, newPassword) => {
-    //modification du mot de passe
     try {
         const hash = await passwordEncryption((newPassword)); //hachage du mot de passe
         return await Student.findOneAndUpdate({email: email}, {password: hash}, {new: true}).select('-password');
@@ -135,8 +288,12 @@ const updatePassword = async (email, newPassword) => {
     }
 }
 
+/**
+ * Vérifie si la promo passé en paramètre est valide (présent dans notre liste de promo
+ * @param promo : String
+ * @returns {boolean} : true si le string passé en paramètre correspond à une promo valide, false sinon
+ */
 const isPromo = (promo) => {
-    //vérifie si la promo entrée en paramètre est valide (présente dans notre liste)
     return listPromo.indexOf(promo)>-1;
 }
 
@@ -152,7 +309,8 @@ module.exports = {
     addStudent,
     addGroupToStudent,
     deleteGroupToStudent,
-    updateStudent,
+    updatePromoToStudent,
+    updateEmailToStudent,
     getStudentById,
     getAllStudents,
     getStudentByNumber,

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const adminController = require('../../../controllers/adminController');
 
-router.post('/', adminController.addAdmin);
+router.put('/updatePassword', require('./updatePassword'));
+router.put('/', require('./updateAdmin'));
 
 module.exports = router;
