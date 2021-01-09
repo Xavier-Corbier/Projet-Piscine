@@ -4,7 +4,7 @@ const Group = require('../models/Group');
 
 /**
  * Ajoute un nouveau slot à la base de données.
- * @param slotObject
+ * @param slotObject le slot
  * @returns {Promise<Document>}
  */
 module.exports.createSlot = async (eventId, date) => {
@@ -116,6 +116,70 @@ module.exports.deleteAllSlotsFromEvent = async (eventId) => {
         await Event.updateOne({ _id: eventId }, { slotList: [] });
         return await Slot.deleteMany({ eventId: eventId });
 
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+/**
+ * Calcule et retourne la date de fin d'un slot à partir de son id.
+ * @param slotId l'id du slot dont on veut la date de fin
+ * @return {Promise<number>} une Promise contenant la date de fin du slot s'il n'y a pas d'erreur
+ */
+// fonction privée donc pas exportée
+const getEndDate = async (slotId) => {
+    try {
+        const slot = Slot.findOne({ _id: slotId });
+        const event = Event.findOne({ _id: slot.eventId });
+        const date = slot.date;
+
+        return date.setMinutes(date.getMinutes + event.slotDuration);
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+/**
+ * Vérifie que le slot passé en paramètre ne chevauche pas un slot déjà existant.
+ * Un slot en chevauche un autre si pour une salle donnée leurs heures sont concurrentes.
+ * @param slot le slot qui ne doit pas chevaucher un slot déjà existant.
+ * @return {Promise<boolean>}
+ */
+/*
+Cette fonction est dans le controller au lieu d'être dans le validationUtils car,
+bien qu'elle fasse une vérification sur le slot, elle interagit avec la base de données (findOne).
+ */
+module.exports.overlaps = async (slot) => {
+    try {
+        if (slot.room === null) {
+            // le slot n'a pas de salle : pas de chevauchement
+            return false;
+        } else {
+            const foundSlot = Slot.findOne({ room: slot.room });
+            if (foundSlot !== null) {
+                // les slots sont dans la même salle, on vérifie que les dates ne se chevauchent pas
+                const uncertainStartDate = slot.date;
+                const uncertainEndDate = getEndDate(slot._id);
+                const startDate = foundSlot.date;
+                const endDate = getEndDate(foundSlot._id);
+
+                if (uncertainStartDate <= endDate && uncertainStartDate >= startDate) {
+                    // la date de début chevauche le slot existant
+                    return true;
+                }
+
+                if (uncertainEndDate <= endDate && uncertainEndDate >= startDate) {
+                    // la date de fin chevauche le slot existant
+                    return true;
+                }
+
+            } else {
+                // aucun slot avec la même salle n'a été trouvé : pas de chevauchement
+                return false;
+            }
+        }
     } catch (error) {
         console.error(error);
         throw error;

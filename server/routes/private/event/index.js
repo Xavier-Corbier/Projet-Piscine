@@ -8,6 +8,4 @@ router.get('/get_all', require('./getAllEvents'));
 router.put('/', require('./updateEvent'));
 router.delete('/', require('./deleteEvent'));
 
-router.get('/test', require('./testEvent'));
-
 module.exports = router;
