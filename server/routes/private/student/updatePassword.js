@@ -1,13 +1,12 @@
 const studentController = require('../../../controllers/studentController');
 const bcrypt = require('bcrypt');
-const regEmail = /^[a-z\-]{3,20}\.[a-z]{3,20}[0-9]{0,3}(@etu.umontpellier.fr)$/
 
 module.exports = async (req, res, next) => {
     try {
-        const {email, oldPassword, newPassword, newPasswordConfirm} = req.body; //récupération des informations
-
-        const student = await studentController.getStudentByEmail(email.trim());
-        if (!student) {
+        const {oldPassword, newPassword, newPasswordConfirm} = req.body; //récupération des informations
+        const idStudent = req.query.id;
+        const studentId = await studentController.getStudentById(idStudent);
+        if (!studentId) {
             return res.status(400).json({error: "Aucun étudiant"});
         }else if (!newPassword || !newPasswordConfirm) {
             return res.status(400).json({error: "Pas de nouveau mot de passe saisi"});
@@ -15,11 +14,12 @@ module.exports = async (req, res, next) => {
             return res.status(400).json({error: "Les mots de passe saisis ne correspondent pas"});
         }
         else {
-            const match = await bcrypt.compare(oldPassword, student.password.toString());
+            const studentWithPassword = await studentController.getStudentByEmail(studentId.email) //sinon ne retourne pas le mot de passe
+            const match = await bcrypt.compare(oldPassword, studentWithPassword.password.toString());
             if(!match){
                 return res.status(400).json({error: "Mot de passe incorrect"});
             }else {
-                const studentUpdate = await studentController.updatePassword(email, newPassword);
+                const studentUpdate = await studentController.updatePassword(studentId.email, newPassword);
                 return res.status(200).json({message: "Mot de passe modifié"});
             }
         }

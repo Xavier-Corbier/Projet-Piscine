@@ -10,7 +10,7 @@ module.exports = async (req, res, next) => {
         const { studentNumber, promo, email, password } = req.body;
         //on vérifie si tout les champs ont bien été remplis
         if (!studentNumber){
-            return res.status(400).json({error : "Aucun numéro étudaint saisi"});
+            return res.status(400).json({error : "Aucun numéro étudiant saisi"});
         }else if (!promo){
             return res.status(400).json({error : "Aucune promo saisie"});
         }else if (!email){

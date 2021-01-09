@@ -28,7 +28,7 @@ module.exports = async (req, res, next) => {
             if (!student) { //aucun étudiant n'est trouvé, on regarde s'il s'agit de l'administrateur qui souhaite se connecter
                 const admin = await adminController.getAdminByEmail(correctEmail);
                 if (!admin) { //l'email n'est pas dans notre base de données
-                    return res.status(401).json({error: "Cet email n'est pas dans notre base de données, essayez de vous inscrire."});
+                    return res.status(400).json({error: "Cet email n'est pas dans notre base de données, essayez de vous inscrire."});
                 }
                 //l'email correspond à l'admin : on vérifie si le mot de passe est correcte
                 const match = await bcrypt.compare(password, admin.password.toString());
