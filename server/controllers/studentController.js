@@ -119,7 +119,7 @@ const getStudentByNumber = async (number) => {
 const getStudentByPromo = async (promo) => {
     //renvoi la liste des étudiants appartenant à une promo précise
     try{
-        return await Student.findOne({promo: promo}).select('-password');
+        return await Student.find({promo: promo}).select('-password');
     }catch (e) {
         console.log(e.message);
     }

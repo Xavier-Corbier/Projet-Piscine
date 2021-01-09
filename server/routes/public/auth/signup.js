@@ -32,13 +32,15 @@ module.exports = async (req, res, next) => {
             return res.status(400).json({error : "Ce numéro étudiant est déjà utilisé"});
         }
         //on vérifie si la promo est une promo valide
-        if (!studentController.isPromo(promo)){
+        const correctPromo = promo.toUpperCase();
+        console.log(correctPromo);
+        if (!studentController.isPromo(correctPromo)){
             return res.status(400).json({error : "La promo saisie n'existe pas"})
         }
         else {
             //si toute les conditions sont vérifiés
             //creation de l'étudiant dans la base de donnée
-            const student = await studentController.addStudent(studentNumber, promo, correctEmail, password);
+            const student = await studentController.addStudent(studentNumber, correctPromo, correctEmail, password);
             //si la création à réussi : creation du token
             const userToken = await token.createUserToken(student, false);
             return  res.status(200).json(userToken);

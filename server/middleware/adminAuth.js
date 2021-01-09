@@ -7,7 +7,7 @@ module.exports = async (req, res , next) => {
         let bearerToken;
         const bearerHeader = req.headers["authorization"]; //récupération du header
         if (typeof bearerHeader !== 'undefined') {
-            const decodedToken = token.decodedToken(bearerHeader);//décodage du token
+            const decodedToken = await token.decodedToken(bearerHeader);//décodage du token
             const isAdmin = decodedToken.isAdmin; //récupération du bool isAdmin stocké dans le token
             if (!isAdmin ) { //il ne s'agit pas de l'admin
                 res.status(403).json({ error : "Impossible d'accéder à cette page protégée"});

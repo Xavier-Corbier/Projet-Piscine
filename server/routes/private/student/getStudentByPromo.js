@@ -2,7 +2,7 @@ const studentController = require('../../../controllers/studentController');
 
 module.exports = async (req, res, next) => {
     try {
-        const promo = req.body.promo.toUpperCase();
+        const promo = req.query.promo.toUpperCase();
         if(!promo){
             return res.status(400).json({error : "Aucune promo saisie"})
         }

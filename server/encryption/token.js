@@ -4,6 +4,7 @@ const decodedToken = async (bearerHeader) => {
     try {
         const bearerToken = bearerHeader.split(" ")[1]; //récupération du token
         const decodedToken = jwt.verify(bearerToken, process.env.tokenkey); //décodage du token
+        return decodedToken;
     } catch (error) {
         console.log("Erreur lors de la récupération du token ");
         return false;

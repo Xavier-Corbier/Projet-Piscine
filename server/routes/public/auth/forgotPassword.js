@@ -8,6 +8,9 @@ module.exports = forgotPassword = async (req, res, next) => {
     try {
         const email = req.body.email; //récupération de l'email de l'utilsateur
         //vérification de la conformité de l'email
+        if(!email){
+            return res.status(400).json({error: "Aucun email saisi"});
+        }
         const correctEmail = email.toLowerCase().trim();
         if (!correctEmail.match(regEmail)) {
             return res.status(400).json({error: "Format de l'email incorrect"});

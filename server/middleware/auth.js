@@ -6,7 +6,8 @@ module.exports = async (req, res , next) => {
     try {
         const bearerHeader = req.headers["authorization"]; //récupération du header
         if (typeof bearerHeader !== 'undefined') {
-            const decodedToken = token.decodedToken(bearerHeader); //décodage du token
+            const decodedToken = await token.decodedToken(bearerHeader); //décodage du token
+            console.log(decodedToken)
             const userId = decodedToken.id; //récupération de l'id stocké dans le token
             const isAdmin = decodedToken.isAdmin; //récupération du bool isAdmin stocké dans le token
             if ((req.query.id && req.query.id.toString() === userId.toString()) || isAdmin ) {
@@ -21,6 +22,7 @@ module.exports = async (req, res , next) => {
             res.status(401).json({message : "Aucun token "})
         }
     }catch(error) {
+        console.log(error)
         res.status(401).json({message: "Unauthorized"});
     }
 };
