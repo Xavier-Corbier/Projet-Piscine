@@ -5,9 +5,6 @@ module.exports = async (req, res, next) => {
         const id = req.query.idGroup;
         const idSlot = req.body.idSlot;
         const group = await groupController.deleteSlotOfGroup(id,idSlot);
-        console.log(id)
-        console.log(idSlot)
-        console.log(group)
         if (!group){
             return res.status(400).json({error: "Suppression impossible du slot"});
         }else {

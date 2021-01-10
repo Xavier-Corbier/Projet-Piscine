@@ -2,7 +2,8 @@ const teacherController = require('../../../controllers/teacherController');
 
 module.exports = async (req, res, next) => {
     try{
-        const teacher = await teacherController.getTeacherId(req.params.id);
+        const id = req.query.idTeacher
+        const teacher = await teacherController.getTeacherId(id);
         if (!teacher){
             return res.status(400).json({error: "Aucun enseignant"});
         }else {

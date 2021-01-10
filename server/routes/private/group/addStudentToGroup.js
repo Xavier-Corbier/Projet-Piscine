@@ -5,20 +5,18 @@ module.exports = async (req, res, next) => {
     try {
         const id = req.query.idGroup;
         const idStudent = req.body.idStudent;
-        const group = await groupController.addStudentToGroup(id, idStudent);
-        console.log(id)
-        console.log(idStudent)
-        console.log(group)
+        const body = await groupController.getGroupById(id)
+        const group = await groupController.addStudentToGroup(id, idStudent, body);
         if (!group){
             return res.status(400).json({error: "Aucun étudiant"});
         }else {
-            /* const test = await studentController.addGroupToStudent(idStudent,id);
+            const test = await studentController.addGroupToStudent(idStudent,id);
             if(!test){
                 return res.status(400).json({error: "Etudiant ajouté au groupe mais l'étudiant n'a pas de groupe, veuillez le supprimer"});
             }
-            else{ */
+            else{
                 return res.status(200).json(group);
-            /*} */
+            }
         }
     }catch(e){
         console.log(e.message);

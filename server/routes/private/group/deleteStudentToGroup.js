@@ -7,9 +7,6 @@ module.exports = async (req, res, next) => {
         const idStudent = req.body.idStudent;
         const group = await groupController.deleteStudentOfGroup(id,idStudent);
         /* await studentController.deleteGroupToStudent(idStudent, id); */
-        console.log(id)
-        console.log(idStudent)
-        console.log(group)
         if (!group){
             return res.status(400).json({error: "Suppression impossible de l'étudiant"});
         }else {
