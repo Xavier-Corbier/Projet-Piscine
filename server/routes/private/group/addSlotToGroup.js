@@ -3,11 +3,8 @@ const groupController = require('../../../controllers/groupController');
 module.exports = async (req, res, next) => {
     try {
         const id = req.query.idGroup;
-        const idSlot = req.body.idSlot;
+        const idSlot = req.body.slot;
         const group = await groupController.addSlotToGroup(id,idSlot);
-        console.log(id)
-        console.log(idSlot)
-        console.log(group)
         if (!group){
             return res.status(400).json({error: "Aucun Groupe"});
         }else {

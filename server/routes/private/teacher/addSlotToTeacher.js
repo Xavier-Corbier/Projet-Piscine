@@ -4,11 +4,8 @@ const teacherController = require('../../../controllers/teacherController');
 module.exports = async (req, res, next) => {
     try {
         const id = req.query.idTeacher;
-        const idSlot = req.body.idSlot;
+        const idSlot = req.body.slot;
         const teacher = await teacherController.addSlotToTeacher(id,idSlot);
-        console.log(id)
-        console.log(idSlot)
-        console.log(teacher)
         if (!teacher){
             return res.status(400).json({error: "Impossible d'ajouter le slot à l'enseignant"});
         }else {

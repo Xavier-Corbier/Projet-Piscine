@@ -1,6 +1,14 @@
 const Group = require('../models/Group');
+const Student = require('../models/Student');
+const Slot = require('../models/Student');
+
 // CRUD
 
+/**
+ * Ajoute/Crée un nouveau groupe à la BDD,
+ * @param groupObject : l'objet JSON représentant le groupe
+ * @returns {Promise<Document>}
+ */
 const createGroup = async (groupObject) => { //Crée un groupe avec au minimum un nom de groupe, une liste d'étudiant et un enseignant.
     try {
         const group = new Group({
@@ -15,7 +23,10 @@ const createGroup = async (groupObject) => { //Crée un groupe avec au minimum u
     }
 };
 
-
+/**
+ * Récupère tout les groupes de la BDD
+ * @returns {Promise<any>}
+ */
 const getGroup = async() => { // Renvoie la liste de tout les groupes
     try {
         return await Group.find();
@@ -24,7 +35,12 @@ const getGroup = async() => { // Renvoie la liste de tout les groupes
         throw error;
     }
 };
-
+/**
+ * Modifie un groupe à partir de l'id de celui-ci
+ * @param id : l'id du groupe à modifier
+ * @param groupObject : l'objet JSON avec lequel on va modifier ce groupe
+ * @returns {Promise<any>}
+ */
 const updateGroup = async (id,groupObject) => {
     try {
         return await Group.findOneAndUpdate( { _id: id}, {_id: id, ...groupObject}, {new:true}); // Modifie un groupe (tout ses attributs), on modifie cet groupe de part son id (_id)
@@ -34,14 +50,30 @@ const updateGroup = async (id,groupObject) => {
     }
 }
 
-const deleteGroup = async (id) => {
+/**
+ * Supprime le groupe entièrement
+ * @param id : id du groupe à supprimer
+ * @param body : permet de récupérer la studentList afin d'enlever le groupe à chaque étudiant
+ * @returns {Promise<any>}
+ */
+const deleteGroup = async (id, body) => {
     try {
+        const studentList = body.studentList
+        for (student in studentList){
+            /*await Student.findOneAndUpdate({_id: student}, {$pull: {group: id}}); */
+            console.log("fait")
+        }
         return await Group.findByIdAndDelete({_id: id});  // Supprime un groupe(tout ses attributs), on le supprime de part son id(_id)
     }catch (error) {
         console.log(error.message);
         throw error;
     }
 }
+/**
+ * Récupère un groupe dans la base de donnée
+ * @param idGroup : id du groupe à récuperer
+ * @returns {Promise<any>}
+ */
 const getGroupById = async(idGroup) => {
     try {
         return await Group.findOne({_id: idGroup});
@@ -61,17 +93,52 @@ const getGroupByStudent = async (studentList) => {
 }
 */
 
-
-const addSlotToGroup = async(id, idSlot) => {
-    try{
-        return await Group.findByIdAndUpdate({_id: id}, {$push: {slot: idSlot}}, {new:true});
-    }catch (error) {
-        console.log(error.message);
+/**
+ * Ajoute un créneau au groupe
+ * @param id : id du groupe auquel on doit ajouter le créneau
+ * @param idSlot : id du créneau que l'on doit ajouter
+ * @returns {Promise<*>}
+ */
+const addSlotToGroup = async (id, idSlot) => {
+    try {
+        await Slot.findByIdAndUpdate({ _id: idSlot }, {$set: {groupId: id }});
+        return await Group.findByIdAndUpdate({_id: id}, {$set: {slot: id}});
+    } catch (error) {
+        console.error(error);
         throw error;
     }
 };
 
-const addStudentToGroup = async (id, idStudent) => {
+/**
+ * Ajoute un étudiant au groupe
+ * @param id : id du groupe auquel on doit ajouter un étudiant
+ * @param idStudent : id de l'étudiant à ajouter au groupe
+ * @param body : objet JSON avec lequel on va eviter d'ajouter des doublons
+ * @returns {Promise<any>}
+ */
+const addStudentToGroup = async (id, idStudent, body) => {
+    try {
+        const studentList = body.studentList
+        if (studentList.includes(idStudent)){
+            return await Group.findByIdAndUpdate({_id: id});
+        }
+        else{
+            return await Group.findByIdAndUpdate({_id: id}, {$push: {studentList: idStudent}});
+        }
+
+    }catch (error) {
+        console.log(error.message);
+        throw error;
+    }
+}
+
+/**
+ * Ajoute le premier étudiant au groupe (lors de la création
+ * @param id : id du groupe auquel on doit ajouter l'étudiant
+ * @param idStudent : id de l'étudiant à ajouter au groupe
+ * @returns {Promise<any>}
+ */
+const addFirstStudentToGroup = async (id, idStudent) => {
     try {
         return await Group.findByIdAndUpdate({_id: id}, {$push: {studentList: idStudent}},{new:true});
     }catch (error) {
@@ -80,18 +147,31 @@ const addStudentToGroup = async (id, idStudent) => {
     }
 }
 
-
+/**
+ * Supprime le Créneau du groupe
+ * @param id : id du groupe à modifier
+ * @param idSlot : id du créneau à enlever
+ * @returns {Promise<any>}
+ */
 const deleteSlotOfGroup = async (id, idSlot) => {
     try {
-        return await Group.findOneAndUpdate({_id: id}, {$pull: {slot: idSlot}});
+        await Slot.findOneAndUpdate({_id: idSlot}, {$unset: {groupId: id }});
+        return await Group.findOneAndUpdate({_id: id}, {$unset: {slot: idSlot}});
     }catch (error) {
         console.log(error.message);
         throw error;
     }
 }
 
+/**
+ * Supprime un étudiant du groupe
+ * @param id : id du groupe à modifier
+ * @param idStudent : id de l'étudiant à modifier
+ * @returns {Promise<*>}
+ */
 const deleteStudentOfGroup = async (id, idStudent) => {
     try {
+        await Student.findOneAndUpdate({_id: idStudent}, {$pull: {group: id}});
         return await Group.findOneAndUpdate({_id: id}, {$pull: {studentList: idStudent}});
     }catch (error) {
         console.log(error.message);
@@ -99,14 +179,18 @@ const deleteStudentOfGroup = async (id, idStudent) => {
     }
 }
 
+/*
+Exportation de toutes les fonctions
+ */
 module.exports = {
     createGroup, //ok
     getGroup, //ok
     updateGroup, //ok
-    deleteGroup, // ok?
+    deleteGroup, // ok
     getGroupById, //ok
-    addSlotToGroup,
-    addStudentToGroup, //ok?
-    deleteSlotOfGroup,
-    deleteStudentOfGroup, // ok?
+    addSlotToGroup, //ok
+    addStudentToGroup, //ok
+    addFirstStudentToGroup, //ok
+    deleteSlotOfGroup, //ok
+    deleteStudentOfGroup, // ok
 }
