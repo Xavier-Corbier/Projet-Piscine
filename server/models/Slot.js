@@ -15,7 +15,5 @@ Contraintes d'unicité d'un slot :
 - soit une autre salle et une autre heure
 le couple (date, salle) doit être unique
  */
-// indexe les clés room et date et assure l'unicité du couple
-slotSchema.index({room: 1, date: 1}, {unique: true});
 
 module.exports = mongoose.model('Slot', slotSchema);

@@ -60,16 +60,12 @@ module.exports.removeSlotFromEvent = async (eventId, slotId) => {
  * @param eventObject l'objet JSON représentant l'event
  * @returns {Promise<void>}
  */
-module.exports.populateEventWithSlots = async function (eventObject) {
+module.exports.populateEventWithSlots = async (eventObject) => {
     const eventId = eventObject._id;
 
     const slotDuration = eventObject.slotDuration;
-    const slotDurationHours = Math.trunc(slotDuration/60); // extrait les heures
-    const slotDurationMinutes = slotDuration%60; // extrait les minutes
 
     const breakDuration = eventObject.breakDuration;
-    const breakDurationHours = Math.trunc(breakDuration/60); // extrait les heures
-    const breakDurationMinutes = breakDuration%60; // extrait les minutes
 
     const startDate = eventObject.startDate;
     const endDate = eventObject.endDate;
@@ -91,14 +87,12 @@ module.exports.populateEventWithSlots = async function (eventObject) {
             await addSlotToEvent(eventId, slot._id);
 
             // incrémente l'heure actuelle avec la durée du slot
-            d.setHours(d.getHours() + slotDurationHours);
-            d.setMinutes(d.getMinutes() + slotDurationMinutes);
+            d.setMinutes(d.getMinutes() + slotDuration);
 
             if (i === 3) {
                 // c'est l'heure de la pause
                 // incrémente l'heure actuelle avec la durée de la pause
-                d.setHours(d.getHours() + breakDurationHours);
-                d.setMinutes(d.getMinutes() + breakDurationMinutes);
+                d.setMinutes(d.getMinutes() + breakDuration);
             }
         }
     }
