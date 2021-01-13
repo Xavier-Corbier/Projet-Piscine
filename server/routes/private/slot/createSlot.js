@@ -3,14 +3,25 @@ const eventController = require('../../../controllers/eventController');
 const validationUtils = require('../../../utils/validationUtils');
 const cleanUtils = require('../../../utils/cleanUtils');
 
+/**
+ * Créé un slot mais il ne doit pas y avoir de jury ni de group passé dans le body de la requête.
+ * L'ajout se fait après.
+ * @param req
+ * @param res
+ * @param next
+ * @return {Promise<*>}
+ */
 module.exports = async (req, res, next) => {
     try {
         const body = req.body;
+        const eventId = body.eventId;
+        const date = body.date;
+        const room = body.room;
 
         cleanUtils.cleanSlot(body);
 
         // Vérifications de format
-        if (validationUtils.isAlphaNumeric(body.room) === false) {
+        if (validationUtils.isAlphaNumeric(room) === false) {
             return res.status(400).json({ error: 'Le nom du slot n\'est pas alphanumérique.' });
         }
 
@@ -20,8 +31,13 @@ module.exports = async (req, res, next) => {
                     'chevauchera un slot déjà existant avec les attributs que vous lui donnez.'});
         }
 
-        const slot = await slotController.createSlot(body.eventId, body.date);
-        const eventId = body.eventId;
+        // Vérifie que l'event existe
+        if (await eventController.getEventById(eventId) === undefined) {
+            return res.status(400).json({ error: 'L\'event que vous avez spécifié n\'existe pas.'});
+        }
+
+        // On peut créer le slot avec le minimum que l'on a ci-dessus
+        const slot = await slotController.createSlot(eventId, date);
         const slotId = slot._id;
 
         // création des liens entre le slot et l'event
