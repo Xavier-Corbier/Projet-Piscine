@@ -1,6 +1,6 @@
 const Student = require('../models/Student');
 const passwordEncryption = require('../encryption/passwordEncryption');
-const userFunctions = require('../userFunctions');
+const userFunctions = require('../utils/userFunctions');
 const listPromo = ["IG3","IG4","IG5","Ancien"]; //liste des promos valides
 
 // CRUD
@@ -85,6 +85,14 @@ const addGroupToStudent = async (idStudent, idGroup) => {
 const deleteGroupToStudent = async (idStudent, idGroup) => {
     try{
         return await Student.updateOne({_id: idStudent}, {$unset: {group: idGroup}}, {new: true}).select("-password");
+    }catch (e) {
+        console.log(e.message);
+    }
+};
+
+const deleteGroupToManyStudent = async (idGroup) => {
+    try{
+        return await Student.updateMany({group: idGroup}, {$unset: {group: idGroup}}, {new: true}).select("-password");
     }catch (e) {
         console.log(e.message);
     }
@@ -288,14 +296,19 @@ const updatePassword = async (email, newPassword) => {
     }
 }
 
-/**
- * Vérifie si la promo passé en paramètre est valide (présent dans notre liste de promo
- * @param promo : String
- * @returns {boolean} : true si le string passé en paramètre correspond à une promo valide, false sinon
- */
-const isPromo = (promo) => {
-    return listPromo.indexOf(promo)>-1;
+const studentExist = async (email) => {
+    try {
+        const student = await getStudentByEmail(email);
+        if(!student){
+            return false
+        }else {
+            return true
+        }
+    }catch (e){
+        console.log(e)
+    }
 }
+
 
 /*
 module.exports.removeCollection = (req, res, next) => {
@@ -309,6 +322,7 @@ module.exports = {
     addStudent,
     addGroupToStudent,
     deleteGroupToStudent,
+    deleteGroupToManyStudent,
     updatePromoToStudent,
     updateEmailToStudent,
     getStudentById,
@@ -318,5 +332,5 @@ module.exports = {
     deleteStudent,
     updatePassword,
     getStudentByPromo,
-    isPromo
+    studentExist
 };

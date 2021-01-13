@@ -1,17 +1,22 @@
 const express = require('express');
 const router = express.Router();
+const groupAuth = require('../../../middleware/groupAuth');
 
-// Routes publiques
+// Routes pour tout les étudiants
+router.get('/', require('./getGroupById'));
 router.post('/', require('./addGroup')); // Create    ok
-router.put('/:idGroup', require('./updateGroup')); // Update    ok
-router.delete('/:idGroup', require('./deleteGroup')); // Delete    ok
-router.put('/addSlot/:idGroup', require('./addSlotToGroup'));//   (ok)
-router.put('/removeSlot/:idGroup', require('./deleteSlotToGroup'));//   (ok)
-router.put('/addStudent/:idGroup', require('./addStudentToGroup'));//    ok
-router.put('/removeStudent/:idGroup', require('./deleteStudentToGroup'));//   ok
+
+//Routes pour les étudiants faisant partie du groupe concerné
+
+router.put('/update', groupAuth , require('./updateGroup')); // Update    ok
+router.delete('/', groupAuth , require('./deleteGroup')); // Delete    ok
+router.put('/addSlot', groupAuth , require('./addSlotToGroup'));//   (ok)
+router.put('/removeSlot', groupAuth , require('./deleteSlotToGroup'));//   (ok)
+router.put('/addStudent', groupAuth , require('./addStudentToGroup'));//    ok
+router.put('/removeStudent', groupAuth , require('./deleteStudentToGroup'));//   ok
+
 // Routes Admin
-router.get('/',require('../../../middleware/adminAuth'), require('./getGroup')); // Read       ok
-router.get('/:idGroup',require('../../../middleware/adminAuth'), require('./getGroupById'));//    ok
+router.get('/allGroups', require('../../../middleware/adminAuth'), require('./getGroup')); // Read       ok
 
 
 module.exports = router;

@@ -1,6 +1,7 @@
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const token = require('../encryption/token');
+const studentController = require('../controllers/studentController');
 
 module.exports = async (req, res , next) => {
     try {
@@ -11,7 +12,15 @@ module.exports = async (req, res , next) => {
             const userId = decodedToken.id; //récupération de l'id stocké dans le token
             const isAdmin = decodedToken.isAdmin; //récupération du bool isAdmin stocké dans le token
             if ((req.query.id && req.query.id.toString() === userId.toString()) || isAdmin ) {
-                //l'id du token correspond à celui de la query : l'étudiant peut accéder à la page OU il s'agit de l'admin
+                //l'id du token correspond à celui de la query OU il s'agit de l'admin
+                //Si ce n'est pas l'admin je verifie que l'utilisateur est bien dans la base de donnée (si vient juste
+                // de supprimer son compte il à encore un id et un token qui se correspondent
+                if (!isAdmin){
+                    const student = await studentController.getStudentById(userId);
+                    if(!student){
+                        return res.status(403).json({error: "Etudiant non trouvé"})
+                    }
+                }
                 next();
                 return true;
             } else { //l'utilisateur n'a pas l'autorisation d'accéder à cette page
