@@ -128,6 +128,11 @@ const updatePassword = async (email, newPassword) => {
     }
 }
 
+/**
+ * Verifie à partir d'un email si un admin existe
+ * @param email : String
+ * @returns {Promise<boolean>}
+ */
 const adminExist = async (email) => {
     try {
         const admin = await getAdminByEmail(email);

@@ -14,10 +14,15 @@ Les middlewares auth et groupAuth ont été passés, on sait que :
 module.exports = async (req, res, next) => {
     try {
         const idGroup = req.query.idGroup; //recuperation de l'id du groupe à modifier
-        const idSlot = req.body.slot; //recuperation du slot à ajouter
+        const idSlot = req.body.idSlot; //recuperation du slot à ajouter
         const idStudent = req.query.id; //récupération de l'id de l'étudiant qui souhaite réserver le créneaux
 
-        //vérification sur le Slot :
+        //on verifie que le groupe n'a pas déjà un créneau réservé
+        const group = await groupController.getGroupById(idGroup);
+        if(group.slot){
+            return res.status(400).json({error: "Votre groupe a déjà un créneau de réservé, veillez le supprimer " +
+                    "avant dans réserver un nouveau"});
+        }
 
         //on vérifie que le slot existe
         const slot = await slotController.getSlotById(idSlot);
@@ -46,7 +51,7 @@ module.exports = async (req, res, next) => {
         //Toutes les vérifications ont été faites : on peut réserver le créneau
 
         //Etape 1 : Ajout du creneau au groupe
-        const group = await groupController.addSlotToGroup(idGroup, idSlot);
+        const groupUpdate = await groupController.addSlotToGroup(idGroup, idSlot);
 
         //Etape 2 : Ajout du groupe au créneau
         await slotController.addGroupToSlot(idSlot, idGroup);
@@ -55,7 +60,7 @@ module.exports = async (req, res, next) => {
         await teacherController.addSlotToTeacher(group.teacher, idSlot);
 
         //le créneaux à bien été réservé
-        return res.status(200).json(group);
+        return res.status(200).json(groupUpdate);
 
     }catch(error){
         console.log(error.message);

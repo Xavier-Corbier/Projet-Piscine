@@ -1,5 +1,10 @@
 const jwt = require('jsonwebtoken');
 
+/**
+ * Prend en paramètre un header bearer, extrait le token et retourne le token décodé ou false s'il n'a pu le décoder
+ * @param bearerHeader
+ * @returns {Promise<boolean|*>}
+ */
 const decodedToken = async (bearerHeader) => {
     try {
         const bearerToken = bearerHeader.split(" ")[1]; //récupération du token
@@ -11,8 +16,13 @@ const decodedToken = async (bearerHeader) => {
     }
 }
 
+/**
+ * Créer le token d'un utilisateur
+ * @param user : ObjectJSON admin ou student
+ * @param isAdmin : boolean pour savoir si l'utilisateur et l'admin
+ * @returns
+ */
 const createUserToken = async (user, isAdmin) => {
-    //création d'un token pour les utilisateurs
     try {
         //données cryptées dans le token
         const tokenUser = {

@@ -3,6 +3,18 @@ const jwt = require('jsonwebtoken');
 const token = require('../encryption/token');
 const studentController = require('../controllers/studentController');
 
+/**
+ * Middleware qui vérifie si l'utilisateur est bien identifié et connecté :
+ * - le token est valide
+ * - l'id du token et l'id de la query correspondent
+ * - l'id correspond à un étudiant de la bdd
+ * si oui il pourra acceder aux routes qui seront placées après le middlewares,
+ * si non il sera bloqué
+ * @param req
+ * @param res
+ * @param next
+ * @returns {Promise<*|CancelableRequest<any>|boolean>}
+ */
 module.exports = async (req, res , next) => {
     try {
         const bearerHeader = req.headers["authorization"]; //récupération du header
