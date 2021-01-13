@@ -17,6 +17,7 @@ module.exports = async (req, res , next) => {
         if (typeof bearerHeader !== 'undefined') {
             const decodedToken = await token.decodedToken(bearerHeader);//décodage du token
             const isAdmin = decodedToken.isAdmin; //récupération du bool isAdmin stocké dans le token
+            console.log(isAdmin)
             if (!isAdmin ) { //il ne s'agit pas de l'admin
                 res.status(403).json({ error : "Impossible d'accéder à cette page protégée"});
                 return false;
