@@ -43,7 +43,7 @@ const getGroup = async() => { // Renvoie la liste de tout les groupes
  */
 const updateGroup = async (id,groupObject) => {
     try {
-        return await Group.findOneAndUpdate( { _id: id}, {_id: id, ...groupObject}, {new:true}); // Modifie un groupe (tout ses attributs), on modifie cet groupe de part son id (_id)
+        return await Group.findOneAndUpdate( { _id: id}, {_id: id, ...groupObject}, {new:true}); // Modifie un groupe, on modifie ce groupe de part son id (_id)
     }catch (error) {
         console.log(error.message);
         throw error;
@@ -52,18 +52,12 @@ const updateGroup = async (id,groupObject) => {
 
 /**
  * Supprime le groupe entièrement
- * @param id : id du groupe à supprimer
- * @param body : permet de récupérer la studentList afin d'enlever le groupe à chaque étudiant
+ * @param id : ObjectId : id du groupe à supprimer
  * @returns {Promise<any>}
  */
-const deleteGroup = async (id, body) => {
+const deleteGroup = async (id) => {
     try {
-        const studentList = body.studentList
-        for (student in studentList){
-            /*await Student.findOneAndUpdate({_id: student}, {$pull: {group: id}}); */
-            console.log("fait")
-        }
-        return await Group.findByIdAndDelete({_id: id});  // Supprime un groupe(tout ses attributs), on le supprime de part son id(_id)
+        return await Group.findByIdAndDelete({_id: id});  // Supprime un groupe, on le supprime de part son id(_id)
     }catch (error) {
         console.log(error.message);
         throw error;
@@ -101,8 +95,7 @@ const getGroupByStudent = async (studentList) => {
  */
 const addSlotToGroup = async (id, idSlot) => {
     try {
-        await Slot.findByIdAndUpdate({ _id: idSlot }, {$set: {groupId: id }});
-        return await Group.findByIdAndUpdate({_id: id}, {$set: {slot: id}});
+        return await Group.findByIdAndUpdate({_id: id}, {slot: idSlot, _id: idGroup},{new: true});
     } catch (error) {
         console.error(error);
         throw error;
@@ -116,16 +109,9 @@ const addSlotToGroup = async (id, idSlot) => {
  * @param body : objet JSON avec lequel on va eviter d'ajouter des doublons
  * @returns {Promise<any>}
  */
-const addStudentToGroup = async (id, idStudent, body) => {
+const addStudentToGroup = async (id, idStudent) => {
     try {
-        const studentList = body.studentList
-        if (studentList.includes(idStudent)){
-            return await Group.findByIdAndUpdate({_id: id});
-        }
-        else{
-            return await Group.findByIdAndUpdate({_id: id}, {$push: {studentList: idStudent}});
-        }
-
+        return await Group.findByIdAndUpdate({_id: id}, {$push: {studentList: idStudent}},{new:true});
     }catch (error) {
         console.log(error.message);
         throw error;
@@ -155,8 +141,7 @@ const addFirstStudentToGroup = async (id, idStudent) => {
  */
 const deleteSlotOfGroup = async (id, idSlot) => {
     try {
-        await Slot.findOneAndUpdate({_id: idSlot}, {$unset: {groupId: id }});
-        return await Group.findOneAndUpdate({_id: id}, {$unset: {slot: idSlot}});
+        return await Group.findOneAndUpdate({_id: id}, {$unset: {slot: idSlot}},{new: true});
     }catch (error) {
         console.log(error.message);
         throw error;
@@ -171,8 +156,7 @@ const deleteSlotOfGroup = async (id, idSlot) => {
  */
 const deleteStudentOfGroup = async (id, idStudent) => {
     try {
-        await Student.findOneAndUpdate({_id: idStudent}, {$pull: {group: id}});
-        return await Group.findOneAndUpdate({_id: id}, {$pull: {studentList: idStudent}});
+        return await Group.findOneAndUpdate({_id: id}, {$pull: {studentList: idStudent}},{new: true});
     }catch (error) {
         console.log(error.message);
         throw error;

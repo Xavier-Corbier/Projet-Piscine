@@ -3,8 +3,8 @@ const studentController = require('../../../controllers/studentController');
 module.exports = async (req, res, next) => {
     try {
         const idStudent = req.params.id;
-        const studentObject = req.body;
-        const student = await studentController.updateStudent(idStudent, studentObject);
+        const idGroup = req.body.idGroup;
+        const student = await studentController.deleteGroupToStudent(idStudent, idGroup);
         if (!student){
             return res.status(400).json({error: "Aucun étudiant"});
         }else {

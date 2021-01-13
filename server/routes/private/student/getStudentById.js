@@ -2,7 +2,7 @@ const studentController = require('../../../controllers/studentController');
 
 module.exports = async (req, res, next) => {
     try {
-        const idStudent = req.params.id;
+        const idStudent = req.query.id; //écupération de l'id de l'étudiant à afficher
         const student = await studentController.getStudentById(idStudent);
         if (!student){
             return res.status(400).json({error: "Aucun étudiant"});

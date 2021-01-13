@@ -1,17 +1,17 @@
 const studentController = require('../../../controllers/studentController');
-const promoController = require('../../../controllers/promoController');
+const groupController = require('../../../controllers/groupController');
 
+//suppression d'un étudiant
 module.exports = async (req, res, next) => {
     try {
-        const idStudent = req.params.id;
-        const student = await studentController.getStudentById(idStudent);
-        const studentPromo = await promoController.getPromoByName(student.promo);
-        const promo = await promoController.deleteStudentToPromo(studentPromo.id, student.id);
-        await studentController.deleteStudent(idStudent);
-        if(!student || !promo){
-            return res.status(400).json({error: "Suppression échouée"});
+        const idStudent = req.query.id; //récupération de l'id de l'étudiant à supprimer
+        const student = await studentController.getStudentById(idStudent); //récupération de l'étudiant à supprimer
+        if(!student){
+            return res.status(400).json({error: "L'étudiant n'existe pas"});
         }else {
-            return res.status(200).json(student);
+            await groupController.deleteStudentOfGroup(student.group, idStudent);
+            await studentController.deleteStudent(idStudent);
+            return res.status(200).json({message : "Suppression réussie"});
         }
     }catch(e){
         console.log(e.message);

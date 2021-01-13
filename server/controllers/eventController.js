@@ -1,40 +1,171 @@
 const Event = require('../models/Event');
+const Slot = require('../models/Slot');
+const slotController = require('./slotController');
 
-module.exports.addEvent = (req, res, next) => {
-    const body = req.body;
-    const event = new Event({
-        name: body.name,
-        slotDuration: body.slotDuration,
-        bookingDeadline: body.bookingDeadline,
-        maxStudentNumber: body.maxStudentNumber,
-        maxJuryNumber: body.maxJuryNumber,
-        startDate: body.startDate,
-        endDate: body.endDate,
-        promo: body.promo,
-        slotList: ["5fe3adc63d08c327858651f1"]
-    });
-    event.save()
-        .then(() => res.status(201).json({ message: 'Event ' + body.name + ' créé !' }))
-        .catch((error) => res.status(500).json({ error }));
+
+/**
+ * Ajoute un nouvel event à la base de données.
+ * @param eventObject l'objet JSON représentant l'event
+ * @returns {Promise<Document>}
+ */
+module.exports.createEvent = async (eventObject) => {
+    try {
+        const event = new Event({
+            ...eventObject,
+            slotList: []
+        });
+        return await event.save(); // on return l'event pour le récupérer dans la partie "then" de la Promise retournée
+    } catch (error) {
+        console.log(error);
+        throw error; // on throw l'erreur pour la récupérer dans la partie "catch" de la Promise retournée
+    }
 };
 
-module.exports.getEvent = (req, res, next) => {
-    Event.findOne({ _id: req.params.id })
-        .then((event) => res.status(200).json({ event }))
-        .catch((error) => res.status(500).json({ message: 'Erreur lors de la récupération de l\'event d\'id '
-                + req.params.id, err: error }));
+/**
+ * Ajoute l'id d'un slot à la liste des slots d'un event.
+ * @param eventId l'id de l'event auquel on va ajouter le slot
+ * @param slotId l'id du slot à ajouter
+ * @returns {Promise<*>}
+ */
+const addSlotToEvent = async (eventId, slotId) => {
+    try {
+        return await Event.updateOne({ _id: eventId }, { $push: { slotList: slotId } });
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+module.exports.addSlotToEvent = addSlotToEvent;
+
+/**
+ * Enlève l'id d'un slot de la liste des slots d'un event.
+ * @param eventId
+ * @param slotId
+ * @returns {Promise<*>}
+ */
+module.exports.removeSlotFromEvent = async (eventId, slotId) => {
+    try {
+        return await Event.updateOne({ _id: eventId }, { $pull: { slotList: slotId } });
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
 };
 
-module.exports.updateEvent = (req, res, next) => {
-    Event.updateOne({ _id: req.params.id }, { ...req.body })
-        .then((event) => res.status(200).json({ event }))
-        .catch((error) => res.status(500).json({ message: 'Erreur lors de la modification de l\'event d\'id '
-            + req.params.id, err: error }));
+/**
+ * Remplit automatiquement un event avec des slots. Les weekends sont ignorés.
+ * @param eventObject l'objet JSON représentant l'event
+ * @returns {Promise<*>}
+ */
+module.exports.populateEventWithSlots = async (eventObject) => {
+    const eventId = eventObject._id;
+
+    const slotDuration = eventObject.slotDuration;
+
+    const breakDuration = eventObject.breakDuration;
+
+    const startDate = eventObject.startDate;
+    const endDate = eventObject.endDate;
+
+    // for "tous les jours de la semaine compris entre la date de début et la date de fin"
+    for (let d = new Date(startDate.getTime()); d <= endDate; d.setDate(d.getDate() + 1)) { // "setDate()" modifie le jour
+
+        if (d.getDay() === 0 || d.getDay() === 6) {
+            // on n'ajoute pas de créneaux le weekend
+            break;
+        }
+
+        // on réinitialise l'heure pour chaque nouveau jour
+        d.setHours(startDate.getHours());
+        d.setMinutes(startDate.getMinutes());
+
+        for (let i = 1; i <= 6; i++) {
+            const slot = await slotController.createSlot(eventId, d); // créé slot
+            const slotId = slot._id;
+
+            // création des liens
+            await addSlotToEvent(eventId, slotId);
+            await slotController.addEventToSlot(slotId, eventId);
+
+
+            // incrémente l'heure actuelle avec la durée du slot
+            d.setMinutes(d.getMinutes() + slotDuration);
+
+            if (i === 3) {
+                // c'est l'heure de la pause
+                // incrémente l'heure actuelle avec la durée de la pause
+                d.setMinutes(d.getMinutes() + breakDuration);
+            }
+        }
+    }
 };
 
-module.exports.deleteEvent = (req, res, next) => {
-    Event.deleteOne({ _id: req.params.id })
-        .then((event) => res.status(200).json({ message: 'L\'event d\'id ' + req.params.id + ' a été supprimé.'}))
-        .catch((error) => res.status(500).json({ message: 'Erreur lors de la suppression de l\'event d\'id '
-        + req.params.id, err: error }));
+/**
+ * Récupère un event dans la base de données à partir de son id.
+ * @param eventId l'id de l'event à récupérer
+ * @returns {Promise<Query<Document | null, Document>>}
+ */
+module.exports.getEventById = async (eventId) => {
+    try {
+        return await Event.findOne({ _id: eventId });
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+/**
+ * Récupère un event dans la base de données à partir de sa promo.
+ * @param promoName la promo de l'event
+ * @returns {Promise<Query<Document | null, Document>>}
+ */
+module.exports.getEventByPromo = async (promoName) => {
+    try {
+        return await Event.findOne({ promo: promoName });
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+/**
+ * Récupère tous les évènements dans la base de données.
+ * @returns {Promise<any>}
+ */
+module.exports.getAllEvents = async () => {
+    try {
+        return await Event.find();
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+/**
+ * Update un event à partir de son id.
+ * @param eventId l'id de l'event à update
+ * @param newEvent l'objet JSON avec lequel on va update l'event
+ * @returns {Promise<any>}
+ */
+module.exports.updateEventById = async (eventId, newEvent) => {
+  try {
+      return await Event.findOneAndUpdate({ _id: eventId }, { _id: eventId, ...newEvent }, { new: true });
+  } catch (error) {
+      console.error(error);
+      throw error;
+  }
+};
+
+/**
+ * Supprime un event à partir de son id.
+ * @param eventId l'id de l'event à supprimer.
+ * @returns {Promise<any>}
+ */
+module.exports.deleteEventById = async (eventId) => {
+    try {
+        return await Event.findByIdAndDelete(eventId);
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
 };
