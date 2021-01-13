@@ -1,12 +1,13 @@
 const studentController = require('../../../controllers/studentController');
+const validationUtils = require('../../../utils/validationUtils');
 
 module.exports = async (req, res, next) => {
     try {
-        const promo = req.query.promo.toUpperCase();
+        const promo = req.body.promo.toUpperCase();
         if(!promo){
             return res.status(400).json({error : "Aucune promo saisie"})
         }
-        if (!studentController.isPromo(promo)){ //on vérifie si la promo saisie est une promo valide
+        if (!validationUtils.isPromo(promo)){ //on vérifie si la promo saisie est une promo valide
             return res.status(400).json({error : "La promo saisie n'existe pas"})
         }
         const students = await studentController.getStudentByPromo(promo);
@@ -16,7 +17,7 @@ module.exports = async (req, res, next) => {
             return res.status(200).json(students);
         }
     }catch(e){
-        console.log(e.message);
+        console.log(e);
         return res.status(500).json({error: "Impossible d'accéder à la liste des élèves concernée"});
     }
 }
