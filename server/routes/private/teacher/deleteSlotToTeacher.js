@@ -6,7 +6,7 @@ module.exports = async (req, res, next) => {
         const id = req.query.idTeacher;
         const idSlot = req.body.slot;
         const slot = await slotController.getSlotById(idSlot);
-        const teacher = await teacherController.getTeacherId(id)
+        const teacher = await teacherController.getTeacherById(id)
         const slotListe = teacher.slotList
 
         if (!slot){ // On regarde si le slot existe
