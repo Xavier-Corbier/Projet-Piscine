@@ -15,24 +15,4 @@ const createNameByEmail = (email) => {
     return [prenomCapitalized, nomCapitalized];
 }
 
-const canManipulateGroup = async (baererHeader, idGroup) => {
-    try {
-        const decodedToken = await tokenFunctions.decodedToken(baererHeader);
-        if (decodedToken.isAdmin){ //l'admin peut agir sur n'importe quel groupe
-            return true
-        }/*else{ //on verifie si l'etudiant fait bien partie du group à modifier
-            const idStudent = decodedToken.id;
-            const student = await studentController.getStudentById(idStudent);
-            if(student.group && student.group.toString() === idGroup.toString()){
-                return true
-            }else{
-                return false
-            }
-        }*/
-        return true
-    }catch(e) {
-        console.log(e);
-    }
-}
-
-module.exports = {createNameByEmail, canManipulateGroup}
+module.exports = {createNameByEmail}
