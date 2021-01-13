@@ -158,7 +158,6 @@ module.exports.deleteSlotById = async (slotId) => {
 module.exports.deleteAllSlotsByEventId = async (eventId) => {
     try {
         return await Slot.deleteMany({ eventId: eventId });
-
     } catch (error) {
         console.error(error);
         throw error;
@@ -228,6 +227,53 @@ module.exports.overlaps = async (slot) => {
         console.error(error);
         throw error;
     }
+};
+
+/**
+ * Indique si un slot chevauche un autre slot (ne vérifie que les dates, pas la salle).
+ * @param slot1 le premier slot
+ * @param slot2 le second slot
+ * @return {Promise<Boolean>}
+ */
+const datesOverlapsWith = async (slotId1, slotId2) => {
+    const slot1 = Slot.findOne({ _id: slotId1 });
+    const slot2 = Slot.findOne({ _id: slotId2 });
+    const startDate1 = slot1.date;
+    const startDate2 = slot2.date;
+    const endDate1 = getEndDate(slot1._id);
+    const endDate2 = getEndDate(slot2._id);
+
+    if (startDate1 >= startDate2 && startDate1 <= endDate2) {
+        // la date de début 1 chevauche le slot 2
+        return true;
+    }
+
+    if (endDate1 >= startDate2 && endDate1 <= endDate2) {
+        //la date de fin 1 chevauche le slot 2
+        return true;
+    }
+
+    // les slots ne se chevauchent pas
+    return false;
+};
+module.exports.datesOverlapsWith = datesOverlapsWith;
+
+/**
+ * Indique si un slot chevauche un des slots compris dans une liste (ne vérifie que les dates, pas les salles).
+ * Précondition : les ids de tous les sots sont valides et existent
+ * @param uncertainSlotId l'id du slot à vérifier
+ * @param slotIdList la liste de slots
+ * @return {Promise<Boolean>}
+ */
+module.exports.datesOverlapsWithSlotList = async (uncertainSlotId, slotIdList) => {
+    const uncertainSlot = Slot.findOne({ _id: uncertainSlotId });
+    for (const slotId in slotIdList) {
+        const slot = Slot.findOne({ _id: slotId});
+        if (await datesOverlapsWith(uncertainSlot, slot)) {
+            return true;
+        }
+    }
+    return false;
 };
 
 /**

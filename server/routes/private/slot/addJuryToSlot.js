@@ -3,18 +3,24 @@ const teacherController = require('../../../controllers/teacherController');
 
 module.exports = async (req, res, next) => {
     try {
-
         const teacherId = req.query.idTeacher;
         const slotId = req.query.idSlot;
 
-        if (await teacherController.getTeacherId(teacherId) === undefined) {
+        const teacher = await teacherController.getTeacherId(teacherId);
+        if (teacherId === undefined) {
             return res.status(400).json({ error: 'Le teacher spécifié n\'existe pas.' });
         }
 
         const slot = await slotController.addJuryToSlot(slotId, teacherId);
-
         if (slot === undefined) {
             return res.status(400).json({ error: 'Le slot spécifié n\'existe pas.' });
+        }
+
+        const teacherSlotList = teacher.slotList;
+        if (teacherSlotList !== undefined || teacherSlotList.length >= 1) {
+            if (await slotController.datesOverlapsWithSlotList(slotId, teacherSlotList)) {
+                return res.status(400).json({ error: 'Le teacher possède déjà un slot qui chevauche cet horaire.' });
+            }
         }
 
         // Le slot et le teacher existent, on créé les liens
