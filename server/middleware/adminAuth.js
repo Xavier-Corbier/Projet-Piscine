@@ -1,7 +1,15 @@
 require('dotenv').config();
-const jwt = require('jsonwebtoken');
 const token = require('../encryption/token');
 
+/**
+ * Middlewares qui vérifie si l'user authantifier correspond à l'admin,
+ * si oui il pourra acceder aux routes qui seront placées après le middlewares,
+ * si non il sera bloqué
+ * @param req
+ * @param res
+ * @param next
+ * @returns {Promise<boolean>}
+ */
 module.exports = async (req, res , next) => {
     try {
         let bearerToken;

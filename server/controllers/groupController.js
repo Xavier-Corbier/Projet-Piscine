@@ -93,24 +93,9 @@ const addStudentToGroup = async (id, idStudent) => {
 }
 
 /**
- * Ajoute le premier étudiant au groupe (lors de la création
- * @param id : id du groupe auquel on doit ajouter l'étudiant
- * @param idStudent : id de l'étudiant à ajouter au groupe
- * @returns {Promise<any>}
- */
-const addFirstStudentToGroup = async (id, idStudent) => {
-    try {
-        return await Group.findByIdAndUpdate({_id: id}, {$push: {studentList: idStudent}},{new:true});
-    }catch (error) {
-        console.log(error.message);
-        throw error;
-    }
-}
-
-/**
  * Supprime le Créneau du groupe
  * @param id : id du groupe à modifier
- * @param idSlot : id du créneau à enlever
+ * @param idSlot : id du créneau à supprimer
  * @returns {Promise<any>}
  */
 const deleteSlotOfGroup = async (id, idSlot) => {
@@ -125,7 +110,7 @@ const deleteSlotOfGroup = async (id, idSlot) => {
 /**
  * Supprime un étudiant du groupe
  * @param id : id du groupe à modifier
- * @param idStudent : id de l'étudiant à modifier
+ * @param idStudent : id de l'étudiant à supprimer
  * @returns {Promise<*>}
  */
 const deleteStudentOfGroup = async (id, idStudent) => {
@@ -137,19 +122,6 @@ const deleteStudentOfGroup = async (id, idStudent) => {
     }
 }
 
-/**
- *
- * @param idSlot
- * @returns {Promise<any>}
- */
-const deleteGroupFromManyStudent = async (idSlot) => {
-    try{
-        return await Group.updateMany({slot: idSlot}, {$unset: {slot: idSlot}}, {new: true});
-    }catch (e) {
-        console.log(e.message);
-    }
-};
-
 /*
 Exportation de toutes les fonctions
  */
@@ -160,8 +132,6 @@ module.exports = {
     getGroupById,
     addSlotToGroup,
     addStudentToGroup,
-    addFirstStudentToGroup,
     deleteSlotOfGroup,
     deleteStudentOfGroup,
-    deleteGroupFromManyStudent
 }

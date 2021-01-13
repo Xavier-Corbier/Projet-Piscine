@@ -1,7 +1,6 @@
 const Student = require('../models/Student');
 const passwordEncryption = require('../encryption/passwordEncryption');
 const userFunctions = require('../utils/userFunctions');
-const listPromo = ["IG3","IG4","IG5","Ancien"]; //liste des promos valides
 
 // CRUD
 
@@ -90,6 +89,11 @@ const deleteGroupToStudent = async (idStudent, idGroup) => {
     }
 };
 
+/**
+ * Supprime la propriété group de tout les étudiants ayant un même idGroup
+ * @param idGroup : ObjectId du groupe qu'il faut supprimer
+ * @returns {Promise<any>}
+ */
 const deleteGroupToManyStudent = async (idGroup) => {
     try{
         return await Student.updateMany({group: idGroup}, {$unset: {group: idGroup}}, {new: true}).select("-password");
@@ -99,11 +103,11 @@ const deleteGroupToManyStudent = async (idGroup) => {
 };
 
 /**
- * Modification d'un étudiant
- * @param idStudent :  ObjectId de l'étudiant concerné
- * @param studentObject : nouvelles informations de l'étudiant
- * @returns {Promise<any>} du type:
-    {
+ * Modification de la promo d'un étudiant  étudiant
+ * @param idStudent: ObjectId de l'étudiant concerné
+ * @param promo : nouvelle promo
+ * @returns {Promise<any>} du type
+ *  {
 	    "_id": ObjectId,
 	    "studentNumber": Number,
 	    "firstname": String,
@@ -121,6 +125,21 @@ const updatePromoToStudent = async (idStudent, promo) => {
     }
 };
 
+/**
+ * Modification de l'email d'un étudiant (et donc du nom et prenom aussi)
+ * @param idStudent: ObjectId de l'étudiant concerné
+ * @param email: nouvel email
+ * @returns {Promise<any>} du type
+ * {
+	    "_id": ObjectId,
+	    "studentNumber": Number,
+	    "firstname": String,
+	    "lastname": String,
+	    "promo": String,
+	    "email": String,
+	    "__v": Int
+    }
+ */
 const updateEmailToStudent = async (idStudent, email) => {
     try {
         const name = userFunctions.createNameByEmail(email);
@@ -184,16 +203,6 @@ const getAllStudents = async () => {
 const getStudentById = async (idStudent) => {
     try{
         return await Student.findOne({ _id: idStudent}).select('-password');
-    }catch (e) {
-        console.log(e.message);
-    }
-};
-
-const getStudentByName = async (name) => {
-    //renvoi une étudiant selon son nom et prenom
-    //prendre en compte que deux étudiants peuvent avoir les mêmes noms et prénoms
-    try{
-        return await Student.findOne({ name: name}).select('-password');
     }catch (e) {
         console.log(e.message);
     }
@@ -296,6 +305,11 @@ const updatePassword = async (email, newPassword) => {
     }
 }
 
+/**
+ * Vérifie si un étudiant est enresgitré dans notre base de donnée grâce à l'email
+ * @param email
+ * @returns {Promise<boolean>}
+ */
 const studentExist = async (email) => {
     try {
         const student = await getStudentByEmail(email);
@@ -308,15 +322,6 @@ const studentExist = async (email) => {
         console.log(e)
     }
 }
-
-
-/*
-module.exports.removeCollection = (req, res, next) => {
-    Student.remove()
-        .then(() => {res.status(200).json({message: "ok"})})
-        .catch(error => {res.status(404).json({error: error})})
-}
-*/
 
 module.exports = {
     addStudent,
