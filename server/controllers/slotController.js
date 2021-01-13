@@ -21,6 +21,38 @@ module.exports.createSlot = async (eventId, date) => {
 };
 
 /**
+ * Ajoute l'id d'un event à un slot.
+ * @param eventId l'id de l'event à ajouter
+ * @param slotId l'id du slot auquel on va ajouter l'event
+ * @return {Promise<*>}
+ */
+const addEventToSlot = async (slotId, eventId) => {
+  try {
+      return await Slot.updateOne({ _id: slotId }, { eventId: eventId });
+  } catch (error) {
+      console.error(error);
+      throw error;
+  }
+};
+module.exports.addEventToSlot = addEventToSlot;
+
+/**
+ * Enlève l'id d'un event à un slot
+ * @param slotId
+ * @param eventId
+ * @return {Promise<*>}
+ */
+/*const removeEventFromSlot = async (slotId) => {
+    try {
+        return await Slot.updateOne({ _id: slotId }, { $unset: { eventId: "" } });
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+module.exports.removeEventFromSlot = removeEventFromSlot;*/
+
+/**
  * Récupère un slot dans la base de données.
  * @param slotId l'id du slot à récupérer
  * @returns {Promise<any>}
@@ -111,9 +143,8 @@ module.exports.deleteSlotById = async (slotId) => {
  * @param eventId
  * @returns {Promise<void>}
  */
-module.exports.deleteAllSlotsFromEvent = async (eventId) => {
+module.exports.deleteAllSlotsByEventId = async (eventId) => {
     try {
-        await Event.updateOne({ _id: eventId }, { slotList: [] });
         return await Slot.deleteMany({ eventId: eventId });
 
     } catch (error) {
@@ -121,6 +152,7 @@ module.exports.deleteAllSlotsFromEvent = async (eventId) => {
         throw error;
     }
 };
+
 
 /**
  * Calcule et retourne la date de fin d'un slot à partir de son id.
