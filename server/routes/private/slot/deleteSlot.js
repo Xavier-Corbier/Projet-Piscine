@@ -15,8 +15,14 @@ module.exports = async (req, res, next) => {
 
         const groupId = slot.groupId;
         if (groupId !== undefined) {
-            // Si le slot avait un groupe, on supprime le slot du groupe
-            await groupController.deleteSlotOfGroup(groupId, slotId);
+            // Il y a un id de groupe
+            const group = groupController.getGroupById(groupId);
+            if (group !== undefined) {
+                // Si le slot avait un groupe, on supprime le slot du groupe
+                await groupController.deleteSlotOfGroup(groupId, slotId);
+            } else {
+                return res.status(400).json({ error: 'Le groupe associé à ce slot n\'existe pas/plus' });
+            }
         }
 
         const jury = slot.jury;
@@ -26,6 +32,7 @@ module.exports = async (req, res, next) => {
                 await teacherController.deleteSlotOfTeacher(juryId, slotId);
             }
         }
+
 
         // le slot a forcément un attribut eventId car il est required dans le model
         await eventController.removeSlotFromEvent(slot.eventId, slotId);

@@ -173,8 +173,8 @@ module.exports.deleteAllSlotsByEventId = async (eventId) => {
 // fonction privée donc pas exportée
 const getEndDate = async (slotId) => {
     try {
-        const slot = Slot.findOne({ _id: slotId });
-        const event = Event.findOne({ _id: slot.eventId });
+        const slot = await Slot.findOne({ _id: slotId });
+        const event = await Event.findOne({ _id: slot.eventId });
         const date = slot.date;
 
         return date.setMinutes(date.getMinutes + event.slotDuration);
@@ -236,8 +236,8 @@ module.exports.overlaps = async (slot) => {
  * @return {Promise<Boolean>}
  */
 const datesOverlapsWith = async (slotId1, slotId2) => {
-    const slot1 = Slot.findOne({ _id: slotId1 });
-    const slot2 = Slot.findOne({ _id: slotId2 });
+    const slot1 =  await Slot.findOne({ _id: slotId1 });
+    const slot2 =  await Slot.findOne({ _id: slotId2 });
     const startDate1 = slot1.date;
     const startDate2 = slot2.date;
     const endDate1 = getEndDate(slot1._id);
@@ -266,12 +266,20 @@ module.exports.datesOverlapsWith = datesOverlapsWith;
  * @return {Promise<Boolean>}
  */
 module.exports.datesOverlapsWithSlotList = async (uncertainSlotId, slotIdList) => {
-    const uncertainSlot = Slot.findOne({ _id: uncertainSlotId });
-    for (const slotId in slotIdList) {
-        const slot = Slot.findOne({ _id: slotId});
-        if (await datesOverlapsWith(uncertainSlot, slot)) {
+    for (let i = 0; i < slotIdList.length; i++) {
+        const slotId = slotIdList[i];
+        const isDateOverlapped = await datesOverlapsWith(uncertainSlotId, slotId);
+        if (isDateOverlapped) {
             return true;
         }
+        /*for (const slotId in slotIdList) {
+            //console.log(slotId);
+            console.log(slotIdList[0]);
+            const isDateOverlapped = await datesOverlapsWith(uncertainSlotId, slotId);
+            if (isDateOverlapped) {
+                return true;
+            }
+        }*/
     }
     return false;
 };
@@ -282,7 +290,7 @@ module.exports.datesOverlapsWithSlotList = async (uncertainSlotId, slotIdList) =
  * @param idTeacher
  * @return {Promise<*>}
  */
-module.exports.addJuryToSlot = async (idSlot, idTeacher) => {
+module.exports.addTeacherToSlot = async (idSlot, idTeacher) => {
     try {
         return await Slot.findByIdAndUpdate({_id: idSlot}, {$push: {jury: idTeacher}});
     }catch (error) {
@@ -297,7 +305,7 @@ module.exports.addJuryToSlot = async (idSlot, idTeacher) => {
  * @param idTeacher
  * @return {Promise<*>}
  */
-module.exports.removeJuryFromSlot = async (idSlot, idTeacher) => {
+module.exports.removeTeacherFromSlot = async (idSlot, idTeacher) => {
     try {
         return await Slot.findOneAndUpdate({_id: idSlot}, {$pull: {jury: idTeacher}});
     }catch (error) {

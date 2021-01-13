@@ -11,7 +11,7 @@ module.exports = async (req, res, next) => {
             return res.status(400).json({ error: 'Le teacher spécifié n\'existe pas.' });
         }
 
-        const slot = await slotController.addJuryToSlot(slotId, teacherId);
+        const slot = await slotController.getSlotById(slotId);
         if (slot === undefined) {
             return res.status(400).json({ error: 'Le slot spécifié n\'existe pas.' });
         }
@@ -24,9 +24,9 @@ module.exports = async (req, res, next) => {
         }
 
         // Le slot et le teacher existent, on créé les liens
-        await slotController.addJuryToSlot(slotId, teacherId);
+        await slotController.addTeacherToSlot(slotId, teacherId);
         await teacherController.addSlotToTeacher(teacherId, slotId);
-
+        return res.status(200).json({message: 'Le teacher a été ajouté au slot avec succès.' });
 
     }catch(error){
         console.log(error.message);

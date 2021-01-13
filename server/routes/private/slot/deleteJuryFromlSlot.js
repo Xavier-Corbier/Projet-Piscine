@@ -10,14 +10,15 @@ module.exports = async (req, res, next) => {
             return res.status(400).json({ error: 'Le teacher spécifié n\'existe pas.' });
         }
 
-        if (await slotController.addJuryToSlot(slotId, teacherId) === undefined) {
+        if (await slotController.getSlotById(slotId) === undefined) {
             return res.status(400).json({ error: 'Le slot spécifié n\'existe pas.' });
         }
 
         // Le teacher et le slot existent, on supprime les liens
-        await slotController.removeJuryFromSlot(slotId, teacherId);
+        await slotController.removeTeacherFromSlot(slotId, teacherId);
         await teacherController.deleteSlotOfTeacher(teacherId, slotId);
 
+        return res.status(200).json({message: 'Le teacher a été supprimé du slot avec succès.' });
     }catch(error){
         console.log(error.message);
         return res.status(500).json({error: error.message});
