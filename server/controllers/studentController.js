@@ -90,6 +90,14 @@ const deleteGroupToStudent = async (idStudent, idGroup) => {
     }
 };
 
+const deleteGroupToManyStudent = async (idGroup) => {
+    try{
+        return await Student.updateMany({group: idGroup}, {$unset: {group: idGroup}}, {new: true}).select("-password");
+    }catch (e) {
+        console.log(e.message);
+    }
+};
+
 /**
  * Modification d'un étudiant
  * @param idStudent :  ObjectId de l'étudiant concerné
@@ -314,6 +322,7 @@ module.exports = {
     addStudent,
     addGroupToStudent,
     deleteGroupToStudent,
+    deleteGroupToManyStudent,
     updatePromoToStudent,
     updateEmailToStudent,
     getStudentById,

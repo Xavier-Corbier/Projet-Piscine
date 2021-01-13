@@ -7,7 +7,6 @@ module.exports = async (req, res, next) => {
         const groupObject = req.body;
         const idTeacher = groupObject.teacher; //attribut required donc forcément présent sinon ValidationError
         const teacher = await teacherController.getTeacherById(idTeacher); //on regarde si le teacher renseigné existe bien
-        console.log(teacher)
         if(!teacher){
             return res.status(400).json({error: "Aucun enseignant trouvé"});
         }

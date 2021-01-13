@@ -20,7 +20,7 @@ const canManipulateGroup = async (baererHeader, idGroup) => {
         const decodedToken = await tokenFunctions.decodedToken(baererHeader);
         if (decodedToken.isAdmin){ //l'admin peut agir sur n'importe quel groupe
             return true
-        }else{ //on verifie si l'etudiant fait bien partie du group à modifier
+        }/*else{ //on verifie si l'etudiant fait bien partie du group à modifier
             const idStudent = decodedToken.id;
             const student = await studentController.getStudentById(idStudent);
             if(student.group && student.group.toString() === idGroup.toString()){
@@ -28,7 +28,8 @@ const canManipulateGroup = async (baererHeader, idGroup) => {
             }else{
                 return false
             }
-        }
+        }*/
+        return true
     }catch(e) {
         console.log(e);
     }
