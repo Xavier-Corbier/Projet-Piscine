@@ -4,12 +4,16 @@ const teacherController = require('../../../controllers/teacherController');
 
 module.exports = async (req, res, next) => {
     try {
-        const groupObject = req.body;
+        const groupObject = req.body; //récupération des informations du group à créer
         const idTeacher = groupObject.teacher; //attribut required donc forcément présent sinon ValidationError
-        const teacher = await teacherController.getTeacherById(idTeacher); //on regarde si le teacher renseigné existe bien
+
+        //on vérifie si le teacher renseigné existe bien
+        const teacher = await teacherController.getTeacherById(idTeacher);
         if(!teacher){
             return res.status(400).json({error: "Aucun enseignant trouvé"});
         }
+
+        //on créer le group
         const group = await groupController.createGroup(groupObject);
         if(!group ){ //si le groupe est nul (groupObject nul ou ne correspond pas au format)
             return res.status(400).json({error: "Création échouée, le groupe n'a pas été créé"});

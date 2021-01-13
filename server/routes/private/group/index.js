@@ -8,7 +8,6 @@ router.post('/', require('./addGroup')); // Create    ok
 
 //Routes pour les étudiants faisant partie du groupe concerné
 
-router.put('/update', groupAuth , require('./updateGroup')); // Update    ok
 router.delete('/', groupAuth , require('./deleteGroup')); // Delete    ok
 router.put('/addSlot', groupAuth , require('./addSlotToGroup'));//   (ok)
 router.put('/removeSlot', groupAuth , require('./deleteSlotToGroup'));//   (ok)
