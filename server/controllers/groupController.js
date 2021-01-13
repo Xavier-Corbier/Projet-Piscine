@@ -52,17 +52,11 @@ const updateGroup = async (id,groupObject) => {
 
 /**
  * Supprime le groupe entièrement
- * @param id : id du groupe à supprimer
- * @param body : permet de récupérer la studentList afin d'enlever le groupe à chaque étudiant
+ * @param id : ObjectId : id du groupe à supprimer
  * @returns {Promise<any>}
  */
-const deleteGroup = async (id, body) => {
+const deleteGroup = async (id) => {
     try {
-        const studentList = body.studentList
-        for (student in studentList){
-            /*await Student.findOneAndUpdate({_id: student}, {$pull: {group: id}}); */
-            console.log("fait")
-        }
         return await Group.findByIdAndDelete({_id: id});  // Supprime un groupe(tout ses attributs), on le supprime de part son id(_id)
     }catch (error) {
         console.log(error.message);

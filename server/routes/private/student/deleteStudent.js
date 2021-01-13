@@ -1,5 +1,5 @@
 const studentController = require('../../../controllers/studentController');
-const promoController = require('../../../controllers/promoController');
+const groupController = require('../../../controllers/groupController');
 
 //suppression d'un étudiant
 module.exports = async (req, res, next) => {
@@ -9,8 +9,8 @@ module.exports = async (req, res, next) => {
         if(!student){
             return res.status(400).json({error: "L'étudiant n'existe pas"});
         }else {
-            const sup = await studentController.deleteStudent(idStudent);
-            console.log(sup)
+            await groupController.deleteStudentOfGroup(student.group, idStudent);
+            await studentController.deleteStudent(idStudent);
             return res.status(200).json({message : "Suppression réussie"});
         }
     }catch(e){

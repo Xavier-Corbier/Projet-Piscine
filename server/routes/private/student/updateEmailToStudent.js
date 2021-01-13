@@ -1,19 +1,20 @@
 const studentController = require('../../../controllers/studentController');
-const regEmail = /^[a-z\-]{3,20}\.[a-z]{3,20}[0-9]{0,3}(@etu.umontpellier.fr)$/
+const validationUtils = require('../../../utils/validationUtils');
 
 module.exports = async (req, res, next) => {
     try {
-        const idStudent = req.query.id;
-        const email = req.body.email;
+        const idStudent = req.query.id; //recuperation de l'id
+        const email = req.body.email; //recuperation de l'email
+        //verification de la conformite de l'email
         if (!email){
             return res.status(400).json({error: "Aucun email saisi"});
         }
         const correctEmail = email.toLowerCase().trim()
-        if (!correctEmail.match(regEmail)) {
+        if (!validationUtils.isStudentEmail(correctEmail)) {
             return res.status(400).json({error: "Format de l'email incorrect"});
         }
-        const studentExistEmail = await studentController.getStudentByEmail(correctEmail);
-        if (studentExistEmail){
+        const studentExist = await studentController.studentExist(correctEmail);
+        if (studentExist){
             return res.status(400).json({error : "Cet email est déjà utilisé"});
         }
         const student = await studentController.updateEmailToStudent(idStudent, correctEmail)

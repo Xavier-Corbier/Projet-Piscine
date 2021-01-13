@@ -2,7 +2,7 @@ const sgMail = require('@sendgrid/mail');
 const randStr = require('randomstring');
 const studentController = require('../../../controllers/studentController');
 const adminController = require('../../../controllers/adminController');
-const regEmail = /^[a-z\-]{3,20}\.[a-z]{3,20}[0-9]{0,3}(@etu.umontpellier.fr)$/
+const validationUtils = require('../../../utils/validationUtils');
 
 module.exports = forgotPassword = async (req, res, next) => {
     try {
@@ -12,14 +12,14 @@ module.exports = forgotPassword = async (req, res, next) => {
             return res.status(400).json({error: "Aucun email saisi"});
         }
         const correctEmail = email.toLowerCase().trim();
-        if (!correctEmail.match(regEmail)) {
+        if (!validationUtils.isUserEmail(correctEmail)) {
             return res.status(400).json({error: "Format de l'email incorrect"});
         }
         //on regarde si l'email existe dans notre base de donnée
-        const student = await studentController.getStudentByEmail(correctEmail);
-        if(!student){ //aucun étudiant trouvé : on vérifie s'il s'agit de l'admin
-            const admin = await adminController.getAdminByEmail(correctEmail);
-            if (!admin) { //aucun utilisateur trouvé
+        const studentExist = await studentController.studentExist(correctEmail);
+        if(!studentExist){ //aucun étudiant trouvé : on vérifie s'il s'agit de l'admin
+            const adminExist = await adminController.adminExist(correctEmail);
+            if (!adminExist) { //aucun utilisateur trouvé
                 res.status(400).json({error: "Aucun utilisateur ne correspond à cette adresse"});
             }
             //il s'agit de l'admin

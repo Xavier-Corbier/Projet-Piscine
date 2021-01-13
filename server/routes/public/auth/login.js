@@ -1,13 +1,10 @@
 require('dotenv').config();
-const regEmail = /^[a-z-]{3,20}\.[a-z]{3,20}[0-9]{0,3}@(etu.)?(umontpellier.fr)$/
-//const regEmail = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
 const jwt = require('jsonwebtoken');
 const studentController = require('../../../controllers/studentController');
 const adminController = require('../../../controllers/adminController');
 const token = require('../../../encryption/token');
+const validationUtils = require('../../../utils/validationUtils');
 const bcrypt = require('bcrypt');
-
-
 
 module.exports = async (req, res, next) => {
     try {
@@ -20,17 +17,18 @@ module.exports = async (req, res, next) => {
         }
         //vérification de la conformité de l'email
         const correctEmail = email.toLowerCase().trim();
-        if (!correctEmail.match(regEmail)) {
+        if (!validationUtils.isUserEmail(correctEmail)) {
             return res.status(400).json({error: "Format de l'email incorrect"});
         } else {
             //on regarde si l'email correspond à un de nos étudiants inscrit
-            const student = await studentController.getStudentByEmail(correctEmail);
-            if (!student) { //aucun étudiant n'est trouvé, on regarde s'il s'agit de l'administrateur qui souhaite se connecter
-                const admin = await adminController.getAdminByEmail(correctEmail);
-                if (!admin) { //l'email n'est pas dans notre base de données
+            const studentExist = await studentController.studentExist(correctEmail);
+            if (!studentExist) { //aucun étudiant n'est trouvé, on regarde s'il s'agit de l'administrateur qui souhaite se connecter
+                const adminExist = await adminController.adminExist(correctEmail);
+                if (!adminExist) { //l'email n'est pas dans notre base de données
                     return res.status(400).json({error: "Cet email n'est pas dans notre base de données, essayez de vous inscrire."});
                 }
                 //l'email correspond à l'admin : on vérifie si le mot de passe est correcte
+                const admin = await adminController.getAdminByEmail(correctEmail);
                 const match = await bcrypt.compare(password, admin.password.toString());
                 if (match) {
                     //Les informations sont correctes : on créer le token
@@ -42,6 +40,7 @@ module.exports = async (req, res, next) => {
                 }
             }
             //l'email correspond à un étudiant : vérification du mot de passe
+            const student = await studentController.getStudentByEmail((correctEmail));
             const match = await bcrypt.compare(password, student.password.toString());
             if (match) {
                 //Les informations sont correctes : on créer le token

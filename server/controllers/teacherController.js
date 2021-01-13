@@ -65,7 +65,7 @@ const deleteTeacher = async(id) => {
  * @param id: id de l'enseignant à récupérer
  * @returns {Promise<*>}
  */
-const getTeacherId = async (id) => {
+const getTeacherById = async (id) => {
     try {
         return await Teacher.findOne({_id: id});
     }catch (e) {
@@ -111,7 +111,7 @@ module.exports = {
     getTeacher, //ok
     updateTeacher, //ok
     deleteTeacher, // ok
-    getTeacherId,// ok
+    getTeacherById,// ok
     addSlotToTeacher, // ok
     deleteSlotOfTeacher, //ok
 };

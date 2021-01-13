@@ -1,6 +1,6 @@
 const Admin = require('../models/Admin');
 const passwordEncryption = require('../encryption/passwordEncryption');
-const userFunctions = require('../userFunctions');
+const userFunctions = require('../utils/userFunctions');
 // CRUD
 
 /**
@@ -128,6 +128,18 @@ const updatePassword = async (email, newPassword) => {
     }
 }
 
+const adminExist = async (email) => {
+    try {
+        const admin = await getAdminByEmail(email);
+        if(!admin){
+            return false
+        }else {
+            return true
+        }
+    }catch (e){
+        console.log(e)
+    }
+}
 
 module.exports =  {
     addAdmin,
@@ -135,5 +147,6 @@ module.exports =  {
     deleteAdmin,
     getAdmin,
     getAdminByEmail,
-    updatePassword
+    updatePassword,
+    adminExist
 };

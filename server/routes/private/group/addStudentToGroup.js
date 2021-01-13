@@ -5,6 +5,7 @@ module.exports = async (req, res, next) => {
     try {
         const id = req.query.idGroup;
         const idStudent = req.body.idStudent;
+        console.log("id",idStudent);
         const body = await groupController.getGroupById(id)
         const group = await groupController.addStudentToGroup(id, idStudent, body);
         if (!group){
