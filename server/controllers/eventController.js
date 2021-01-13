@@ -22,16 +22,14 @@ module.exports.createEvent = async (eventObject) => {
 };
 
 /**
- * Ajoute l'id d'un slot à la liste des slots d'un event
- * et l'id de l'event au slot ajouté.
+ * Ajoute l'id d'un slot à la liste des slots d'un event.
  * @param eventId l'id de l'event auquel on va ajouter le slot
  * @param slotId l'id du slot à ajouter
- * @returns {Promise<void>}
+ * @returns {Promise<*>}
  */
 const addSlotToEvent = async (eventId, slotId) => {
     try {
-        Slot.updateOne({ _id: slotId }, { eventId: eventId });
-        return await Event.updateOne({ _id: eventId }, { $push: { slotList: slotId } }, {new: true});
+        return await Event.updateOne({ _id: eventId }, { $push: { slotList: slotId } });
     } catch (error) {
         console.error(error);
         throw error;
@@ -40,15 +38,14 @@ const addSlotToEvent = async (eventId, slotId) => {
 module.exports.addSlotToEvent = addSlotToEvent;
 
 /**
- *
+ * Enlève l'id d'un slot de la liste des slots d'un event.
  * @param eventId
  * @param slotId
- * @returns {Promise<void>}
+ * @returns {Promise<*>}
  */
 module.exports.removeSlotFromEvent = async (eventId, slotId) => {
     try {
-        Slot.updateOne({ _id: slotId }, { event: eventId });
-        return await Event.updateOne({ _id: eventId }, { $pull: { slotList: slotId } }, {new: true});
+        return await Event.updateOne({ _id: eventId }, { $pull: { slotList: slotId } });
     } catch (error) {
         console.error(error);
         throw error;
@@ -58,7 +55,7 @@ module.exports.removeSlotFromEvent = async (eventId, slotId) => {
 /**
  * Remplit automatiquement un event avec des slots. Les weekends sont ignorés.
  * @param eventObject l'objet JSON représentant l'event
- * @returns {Promise<void>}
+ * @returns {Promise<*>}
  */
 module.exports.populateEventWithSlots = async (eventObject) => {
     const eventId = eventObject._id;
@@ -83,8 +80,13 @@ module.exports.populateEventWithSlots = async (eventObject) => {
         d.setMinutes(startDate.getMinutes());
 
         for (let i = 1; i <= 6; i++) {
-            let slot = await slotController.createSlot(eventId, d);
-            await addSlotToEvent(eventId, slot._id);
+            const slot = await slotController.createSlot(eventId, d); // créé slot
+            const slotId = slot._id;
+
+            // création des liens
+            await addSlotToEvent(eventId, slotId);
+            await slotController.addEventToSlot(slotId, eventId);
+
 
             // incrémente l'heure actuelle avec la durée du slot
             d.setMinutes(d.getMinutes() + slotDuration);
@@ -99,13 +101,27 @@ module.exports.populateEventWithSlots = async (eventObject) => {
 };
 
 /**
- * Récupère un event dans la base de données.
+ * Récupère un event dans la base de données à partir de son id.
  * @param eventId l'id de l'event à récupérer
  * @returns {Promise<Query<Document | null, Document>>}
  */
 module.exports.getEventById = async (eventId) => {
     try {
         return await Event.findOne({ _id: eventId });
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+/**
+ * Récupère un event dans la base de données à partir de sa promo.
+ * @param promoName la promo de l'event
+ * @returns {Promise<Query<Document | null, Document>>}
+ */
+module.exports.getEventByPromo = async (promoName) => {
+    try {
+        return await Event.findOne({ promo: promoName });
     } catch (error) {
         console.error(error);
         throw error;
