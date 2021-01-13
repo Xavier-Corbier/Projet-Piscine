@@ -1,6 +1,5 @@
 const Slot = require('../models/Slot');
 const Event = require('../models/Event');
-const Group = require('../models/Group');
 
 /**
  * Ajoute un nouveau slot à la base de données.
@@ -101,7 +100,7 @@ module.exports.getAllSlotsFromEvent = async (eventId) => {
  */
 module.exports.updateSlotById = async (slotId, newSlot) => {
     try {
-        return await Slot.updateOne({ _id: slotId }, { _id: slotId, ...newSlot }, { new: true });
+        return await Slot.updateOne({ _id: slotId }, { _id: slotId, ...newSlot });
     } catch (error) {
         console.error(error);
         throw error;
@@ -109,15 +108,28 @@ module.exports.updateSlotById = async (slotId, newSlot) => {
 };
 
 /**
- * Ajoute un groupe à un slot et le groupe au slot.
+ * Ajoute un groupe à un slot.
  * @param slotID
  * @param groupId
  * @returns {Promise<any>}
  */
 module.exports.addGroupToSlot = async (slotId, groupId) => {
     try {
-        await Group.updateOne({ _id: groupId }), { slot: slotId};
         return await Slot.updateOne({ _id: slotId }, { groupId: groupId });
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+/**
+ * Supprime un groupe d'un slot.
+ * @param slotId
+ * @return {Promise<*>}
+ */
+module.exports.removeGroupFromSlot = async (slotId) => {
+    try {
+        return await Slot.updateOne({ _id: slotId }, { $unset: { groupId: "" } });
     } catch (error) {
         console.error(error);
         throw error;
@@ -218,20 +230,32 @@ module.exports.overlaps = async (slot) => {
     }
 };
 
+/**
+ * Ajoute un jury (teacher) à la liste de jury du slot
+ * @param idSlot
+ * @param idTeacher
+ * @return {Promise<*>}
+ */
 module.exports.addJuryToSlot = async (idSlot, idTeacher) => {
     try {
-        return await Slot.findByIdAndUpdate({_id: idSlot}, {$push: {jury: idTeacher}},{new: true});
+        return await Slot.findByIdAndUpdate({_id: idSlot}, {$push: {jury: idTeacher}});
     }catch (error) {
         console.log(error.message);
         throw error;
     }
-}
+};
 
-module.exports.deleteJuryToSlot = async (idSlot, idTeacher) => {
+/**
+ * Supprime un jury (teacher) de la liste de jury du slot.
+ * @param idSlot
+ * @param idTeacher
+ * @return {Promise<*>}
+ */
+module.exports.removeJuryFromSlot = async (idSlot, idTeacher) => {
     try {
-        return await Slot.findOneAndUpdate({_id: idSlot}, {$pull: {jury: idTeacher}},{new: true});
+        return await Slot.findOneAndUpdate({_id: idSlot}, {$pull: {jury: idTeacher}});
     }catch (error) {
         console.log(error.message);
         throw error;
     }
-}
+};

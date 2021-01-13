@@ -4,7 +4,7 @@ const eventSchema = mongoose.Schema({
     name: { type: String, required: true, unique: true},
     color: { type: String, required: true, unique: true},
     maxStudentNumber: { type: Number, required: true },
-    maxJuryNumber: { type: Number, required: true },
+    maxJuryNumber: { type: Number },
     slotDuration: { type: Number, required: true },
     breakDuration: {type: Number, required: true},
     bookingDeadline: { type: Date, required: true },
