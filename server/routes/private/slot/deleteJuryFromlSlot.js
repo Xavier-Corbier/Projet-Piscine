@@ -6,7 +6,7 @@ module.exports = async (req, res, next) => {
         const teacherId = req.query.idTeacher;
         const slotId = req.query.idSlot;
 
-        if (await teacherController.getTeacherId(teacherId) === undefined) {
+        if (await teacherController.getTeacherById(teacherId) === undefined) {
             return res.status(400).json({ error: 'Le teacher spécifié n\'existe pas.' });
         }
 
