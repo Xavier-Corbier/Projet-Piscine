@@ -217,3 +217,21 @@ module.exports.overlaps = async (slot) => {
         throw error;
     }
 };
+
+module.exports.addJuryToSlot = async (idSlot, idTeacher) => {
+    try {
+        return await Slot.findByIdAndUpdate({_id: idSlot}, {$push: {jury: idTeacher}},{new: true});
+    }catch (error) {
+        console.log(error.message);
+        throw error;
+    }
+}
+
+module.exports.deleteJuryToSlot = async (idSlot, idTeacher) => {
+    try {
+        return await Slot.findOneAndUpdate({_id: idSlot}, {$pull: {jury: idTeacher}},{new: true});
+    }catch (error) {
+        console.log(error.message);
+        throw error;
+    }
+}
