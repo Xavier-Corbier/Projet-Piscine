@@ -3,14 +3,15 @@ const validationUtils = require('../../../utils/validationUtils');
 
 module.exports = async (req, res, next) => {
     try {
-        const promo = req.body.promo.toUpperCase();
+        const promo = req.query.promo;
         if(!promo){
             return res.status(400).json({error : "Aucune promo saisie"})
         }
-        if (!validationUtils.isPromo(promo)){ //on vérifie si la promo saisie est une promo valide
+        const correctPromo = promo.toUpperCase().trim();
+        if (!validationUtils.isPromo(correctPromo)){ //on vérifie si la promo saisie est une promo valide
             return res.status(400).json({error : "La promo saisie n'existe pas"})
         }
-        const students = await studentController.getStudentByPromo(promo);
+        const students = await studentController.getStudentByPromo(correctPromo);
         if (!students){
             return res.status(400).json({error: "Aucun étudiant"});
         }else {
