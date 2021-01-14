@@ -13,7 +13,9 @@ Les middlewares auth, deadlineMiddleware et groupAutorization  ont été passés
  */
 
 /**
- * Réservation d'un slot par un groupe : ajoute le slot au groupe, ajoute le groupe au slot et ajoute le slot au
+ * Réservation d'un slot par un groupe : ajoute le slot au groupe, ajoute le groupe au slot,
+ * si le teacher référent n'était pas déjà présent dans la liste : ajoute le slot au teacher et le teacher au
+ * jury du slot
  * teacher référent du groupe
  * Préconditions :
  *  - le groupe ne doit pas avoir de créneau réservé
@@ -64,6 +66,22 @@ module.exports = async (req, res, next) => {
                     "évènement auquel vous avez accés"})
         }
 
+        //on vérifie si le teacher référent du group fait déjà partie des jurys de ce créneau :
+        //si oui pas de risque de chevauchement
+        const idTeacher = group.teacher;
+        const teacher = await teacherController.getTeacherById(idTeacher)
+        const teacherSlotList = teacher.slotList;
+        var isJury = false;
+        if (slot.jury.includes(idTeacher) === true) { //on regarde si le prof fait partie de la liste des jury du slot
+            isJury = true
+        }else if (teacherSlotList !== undefined || teacherSlotList.length >= 1) { //sinon on regarde si un de ses slot
+            // ne chevauche pas le slot que le groupe veut réserver
+            if (await slotController.datesOverlapsWithSlotList(slotId, teacherSlotList)) {
+                return res.status(400).json({error: "Vous ne pouvez pas réserver ce créneaux, votre prof référant ne " +
+                        "sera pas disponible pour y assister"})
+            }
+        }
+
         //Toutes les vérifications ont été faites : on peut réserver le créneau
 
         //Etape 1 : Ajout du creneau au groupe
@@ -72,8 +90,13 @@ module.exports = async (req, res, next) => {
         //Etape 2 : Ajout du groupe au créneau
         await slotController.addGroupToSlot(idSlot, idGroup);
 
-        //Etape 3 : Ajout du créneau au prof référent du groupe qui devra assister à la soutenance
-        await teacherController.addSlotToTeacher(group.teacher, idSlot);
+        if (!isJury){ //si le prof n'est pas déjà assigné comme jury du slot
+            //Etape 3 : Ajout du créneau au prof référent du groupe qui devra assister à la soutenance
+            await teacherController.addSlotToTeacher(group.teacher, idSlot);
+
+            //Etape 4 : Ajout du teacher dans les jury du slot
+            await slotController.addTeacherToSlot(idSlot, idTeacher);
+        }
 
         //le créneaux à bien été réservé
         return res.status(200).json(groupUpdate);
