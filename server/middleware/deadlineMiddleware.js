@@ -16,11 +16,14 @@ module.exports = async (req, res, next) => {
         const student = await studentController.getStudentById(idStudent);
 
         //on vérifie que la deadline de l'evenement n'est pas passé
-        const event = await eventController.getEventByPromo(student.promo);
-        console.log(event.bookingDeadline, new Date())
+        const promo = student.promo;
+        const event = await eventController.getEventByPromo(promo);
+        if (event === null) {
+            res.status(403).json({error: "Il n\'y a pas d\'event pour la promo " + promo});
+        }
         if (new Date() > event.bookingDeadline) {
             res.status(403).json({error: "La date limite de réservation est dépassée"});
-            return false
+            return false;
         }else {
             next();
             return true;

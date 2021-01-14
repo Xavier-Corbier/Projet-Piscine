@@ -66,7 +66,7 @@ module.exports = async (req, res, next) => {
                const studentIdList = group.studentList;
 
                if (studentIdList !== undefined && studentIdList.length >= 1) {
-                   for (let y = 0; y < studentIdList.length; j ++) {
+                   for (let j = 0; j < studentIdList.length; j ++) {
 
                        const studentId = studentIdList[j];
                        const student = await studentController.getStudentById(studentId);
