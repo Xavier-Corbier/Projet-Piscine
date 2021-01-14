@@ -17,7 +17,7 @@ module.exports = async (req, res, next) => {
         }
 
         const teacherSlotList = teacher.slotList;
-        if (teacherSlotList !== undefined || teacherSlotList.length >= 1) {
+        if (teacherSlotList !== undefined && teacherSlotList.length >= 1) {
             if (await slotController.datesOverlapsWithSlotList(slotId, teacherSlotList)) {
                 return res.status(400).json({ error: 'Ce slot chevauchera un slot déjà existant du teacher.' });
             }

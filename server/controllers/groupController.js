@@ -47,7 +47,7 @@ const deleteGroup = async (id) => {
         console.log(error.message);
         throw error;
     }
-}
+};
 
 /**
  * Supprime tout les groupes selon leur promo
@@ -56,12 +56,26 @@ const deleteGroup = async (id) => {
  */
 const deleteAllGroupsByPromo = async (promo) => {
     try {
-        return await Group.deleteMany({promo: promo});
+        return await Group.deleteMany({ promo: promo });
     }catch (error) {
         console.log(error.message);
         throw error;
     }
-}
+};
+
+/**
+ * Récupère tous les groupes ayant une même promo.
+ * @param promo
+ * @return {Promise<*>}
+ */
+const getGroupsByPromo = async (promo) => {
+    try {
+        return await Group.find({ promo: promo });
+    } catch (error) {
+        console.log(error.message);
+        throw error;
+    }
+};
 
 /**
  * Récupère un groupe dans la base de donnée selon l'id
@@ -75,7 +89,7 @@ const getGroupById = async(idGroup) => {
         console.log(error.message);
         throw error;
     }
-}
+};
 
 /**
  * Ajoute un créneau au groupe
@@ -105,7 +119,7 @@ const addStudentToGroup = async (id, idStudent) => {
         console.log(error.message);
         throw error;
     }
-}
+};
 
 /**
  * Supprime le Créneau du groupe
@@ -120,7 +134,7 @@ const deleteSlotOfGroup = async (id, idSlot) => {
         console.log(error.message);
         throw error;
     }
-}
+};
 
 /**
  * Supprime un étudiant du groupe
@@ -135,7 +149,7 @@ const deleteStudentOfGroup = async (id, idStudent) => {
         console.log(error.message);
         throw error;
     }
-}
+};
 
 /*
 Exportation de toutes les fonctions
@@ -145,9 +159,10 @@ module.exports = {
     getGroup,
     deleteGroup,
     deleteAllGroupsByPromo,
+    getGroupsByPromo,
     getGroupById,
     addSlotToGroup,
     addStudentToGroup,
     deleteSlotOfGroup,
     deleteStudentOfGroup,
-}
+};

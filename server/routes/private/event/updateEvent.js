@@ -9,11 +9,16 @@ module.exports = async (req, res, next) => {
         const body = req.body;
         cleanUtils.cleanEvent(body);
 
+        const event = await eventController.getEventById(eventId);
+        if (event === null) {
+            return res.status(400).json({ error: 'L\'event n\'existe pas.' });
+        }
+
         // Vérifications
-        if (validationUtils.isAlphaNumeric(body.name) === false) {
+        if (body.name !== undefined && validationUtils.isAlphaNumeric(body.name) === false) {
             return res.status(400).json({ error: 'Le nom de l\'event n\'est pas alphanumérique.' });
         }
-        if (validationUtils.isHexColorCode(body.color) === false) {
+        if (body.color !== undefined && validationUtils.isHexColorCode(body.color) === false) {
             return res.status(400).json({ error: 'La couleur n\'est pas au bon format.' });
         }
         if (validationUtils.isEditable(body, ['name', 'color', 'bookingDeadline']) === false) {
