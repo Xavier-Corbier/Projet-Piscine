@@ -1,5 +1,12 @@
 const groupController = require('../../../controllers/groupController');
 
+/**
+ * Retourne tout les groupes de la bdd
+ * @param req
+ * @param res
+ * @param next
+ * @returns {Promise<*|CancelableRequest<any>>}
+ */
 module.exports = async (req, res, next) => {
     try {
         const group = await groupController.getGroup()

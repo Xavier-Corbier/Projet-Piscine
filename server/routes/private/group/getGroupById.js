@@ -1,5 +1,13 @@
 const groupController = require('../../../controllers/groupController');
 
+/**
+ * Retourne un groupe à partir de son id
+ * @param req
+    * query : doit contenir l'id du groupe
+ * @param res
+ * @param next
+ * @returns {Promise<*|CancelableRequest<any>>}
+ */
 module.exports = async (req, res, next) => {
     try{
         const id = req.query.idGroup;

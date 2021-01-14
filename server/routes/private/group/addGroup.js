@@ -2,6 +2,29 @@ const groupController = require('../../../controllers/groupController');
 const studentController = require('../../../controllers/studentController');
 const teacherController = require('../../../controllers/teacherController');
 
+/*
+Les middlewares auth et deadlineMiddleware ont été passés, on sait que :
+    - l'étudiant dont l'id se trouve dans la query existe
+    - la deadline de l'evenement n'est pas dépassée
+ */
+
+/**
+ * Créer un groupe avec un nom et un teacher référent au minimum
+ * Il est possible d'avoir comme autres propriétés : le nom de l'entreprise et/ou le nom et le prenom du tuteur de
+ * l'entreprise
+ * A la création du groupe l'étudiant à l'origine de la création est directement ajouté dans le groupe, et son attribut
+ * groupe est créé. La promo du group est défini en fonction de la promo de l'étudiant qui le créer
+ * Préconditions:
+ *  - l'étudiant créateur ne doit pas avoir déjà de groupe renseigné
+ *  - un teacher référent doit être renseigné et doit correspondre à un enseignant de notre bdd
+ * Erreur possible : utilisation d'un nom déjà pris
+ * @param req
+    * query : l'id du student authentifié
+    * body : doit contenir un groupObject (au minimum nom et teacher référent)
+ * @param res
+ * @param next
+ * @returns {Promise<*|CancelableRequest<any>>}
+ */
 module.exports = async (req, res, next) => {
     try {
         const groupObject = req.body; //récupération des informations du group à créer
@@ -21,7 +44,8 @@ module.exports = async (req, res, next) => {
         }
 
         //on créer le group
-        const group = await groupController.createGroup(groupObject);
+        const promo = student.promo;
+        const group = await groupController.createGroup(groupObject, promo);
         if(!group ){ //si le groupe est nul (groupObject nul ou ne correspond pas au format)
             return res.status(400).json({error: "Création échouée, le groupe n'a pas été créé"});
         }else {
