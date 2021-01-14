@@ -38,13 +38,13 @@ module.exports = async (req, res, next) => {
         const idSlot = group.slot;
         if (idSlot){
             //Etape 1.1 : supprimer le groupe du slot
-            await slotController.removeGroupFromSlot(idSLot);
+            await slotController.removeGroupFromSlot(idSlot);
 
             //Etape 1.2 : supprimer le slot du teacher
-            await teacherController.deleteSlotOfTeacher(group.teacher, idSLot);
+            await teacherController.deleteSlotOfTeacher(group.teacher, idSlot);
 
             //Etape 1.3 : supprimer le teacher du jury du slot
-            await slotController.removeTeacherFromSlot(idSLot, group.teacher);
+            await slotController.removeTeacherFromSlot(idSlot, group.teacher);
         }
 
         //Etape 2 : supprimer la propriété group de tout les étudiants du groupe
