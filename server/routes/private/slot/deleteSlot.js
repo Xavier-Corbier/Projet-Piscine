@@ -22,7 +22,7 @@ module.exports = async (req, res, next) => {
                 // Si le slot avait un groupe, on supprime le slot du groupe
                 await groupController.deleteSlotOfGroup(groupId, slotId);
             } else {
-                console.error('Le groupe associé à ce slot n\'existe pas/plus, continuation de la suppression...');
+                console.error('Le groupe associé à ce slot n\'existe pas, continuation de la suppression...');
             }
         }
 
@@ -35,7 +35,7 @@ module.exports = async (req, res, next) => {
                 if (jury !== null) {
                     await teacherController.deleteSlotOfTeacher(juryId, slotId);
                 } else {
-                    console.error('Un des teachers associés à ce slot n\'existent pas/plus, ' +
+                    console.error('Un des teachers associés à ce slot n\'existent pas, ' +
                         'continuation de la suppression...');
                 }
             }
@@ -46,7 +46,7 @@ module.exports = async (req, res, next) => {
         if (event !== null) {
             await eventController.removeSlotFromEvent(eventId, slotId);
         } else {
-            console.error('L\'event associé à ce slot n\'existe pas/plus, continuation de la suppression...');
+            console.error('L\'event associé à ce slot n\'existe pas, continuation de la suppression...');
         }
 
         // On a supprimé tous les liens qui existaient avec les autres entités, on peut maintenant supprimer le slot

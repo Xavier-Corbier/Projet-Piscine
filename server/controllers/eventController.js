@@ -103,7 +103,7 @@ module.exports.populateEventWithSlots = async (eventObject) => {
 /**
  * Récupère un event dans la base de données à partir de son id.
  * @param eventId l'id de l'event à récupérer
- * @returns {Promise<Query<Document | null, Document>>}
+ * @returns {Promise<*>}
  */
 module.exports.getEventById = async (eventId) => {
     try {
