@@ -3,12 +3,23 @@ const slotController = require('../../../controllers/slotController');
 const teacherController = require('../../../controllers/teacherController');
 
 /*
-Les middlewares auth et groupAuth ont été passés, on sait que :
+Les middlewares auth, deadlineMiddleware et groupAutorization  ont été passés, on sait que :
     - l'étudiant dont l'id se trouve dans la query existe
     - le groupe qui est dans la query existe
     - l'étudiant fait partie du groupe qu'il veut modifier
+    - la deadline de l'evenement n'est pas dépassée
  */
 
+/**
+ * Suppression ude slot d'un group : supprime le slot du group, le group du slot et le slot du teacher référent
+ * Préconditions :
+ * - le groupe doit avoir un créneau réservé
+ * @param req
+    * query : doit contenir l'id d'un group et de l'étudiant authentifié
+ * @param res
+ * @param next
+ * @returns {Promise<*|CancelableRequest<any>>}
+ */
 module.exports = async (req, res, next) => {
     try {
         const idGroup = req.query.idGroup; //récupération de l'id du groupe à modifier

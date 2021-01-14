@@ -7,10 +7,11 @@ const Group = require('../models/Group');
  * @param groupObject : l'objet JSON représentant le groupe
  * @returns {Promise<Document>}
  */
-const createGroup = async (groupObject) => { //Crée un groupe avec au minimum un nom de groupe, une liste d'étudiant et un enseignant.
+const createGroup = async (groupObject, promo) => { //Crée un groupe avec au minimum un nom de groupe, une liste d'étudiant et un enseignant.
     try {
         const group = new Group({
             ...groupObject,
+            promo,
             studentList: [],
         });
 
@@ -42,6 +43,20 @@ const getGroup = async() => { // Renvoie la liste de tout les groupes
 const deleteGroup = async (id) => {
     try {
         return await Group.findByIdAndDelete({_id: id});  // Supprime un groupe, on le supprime de part son id(_id)
+    }catch (error) {
+        console.log(error.message);
+        throw error;
+    }
+}
+
+/**
+ * Supprime tout les groupes selon leur promo
+ * @param promo : String
+ * @returns {Promise<awaited Query<any, DocType>|DeleteWriteOpResultObject>}
+ */
+const deleteAllGroupsByPromo = async (promo) => {
+    try {
+        return await Group.deleteMany({promo: promo});
     }catch (error) {
         console.log(error.message);
         throw error;
@@ -129,6 +144,7 @@ module.exports = {
     createGroup,
     getGroup,
     deleteGroup,
+    deleteAllGroupsByPromo,
     getGroupById,
     addSlotToGroup,
     addStudentToGroup,

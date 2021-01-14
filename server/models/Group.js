@@ -7,7 +7,8 @@ const groupSchema = mongoose.Schema({
     companyName: {type: String},
     slot: {type: mongoose.Schema.Types.ObjectId, ref: 'Slot'},
     teacher: {type: mongoose.Schema.Types.ObjectId, ref: 'Teacher', required : true},
-    studentList: [{type: mongoose.Schema.Types.ObjectId, ref: 'studentList', required : true, unique : true}]
+    studentList: [{type: mongoose.Schema.Types.ObjectId, ref: 'studentList', required : true, unique : true}],
+    promo: {type: String, required : true}
 });
 
 module.exports = mongoose.model('Group', groupSchema);

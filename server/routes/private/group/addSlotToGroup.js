@@ -5,12 +5,29 @@ const studentController = require('../../../controllers/studentController');
 const teacherController = require('../../../controllers/teacherController');
 
 /*
-Les middlewares auth et groupAuth ont été passés, on sait que :
+Les middlewares auth, deadlineMiddleware et groupAutorization  ont été passés, on sait que :
     - l'étudiant dont l'id se trouve dans la query existe
     - le groupe qui est dans la query existe
     - l'étudiant fait partie du groupe qu'il veut modifier
+    - la deadline de l'evenement n'est pas dépassée
  */
 
+/**
+ * Réservation d'un slot par un groupe : ajoute le slot au groupe, ajoute le groupe au slot et ajoute le slot au
+ * teacher référent du groupe
+ * Préconditions :
+ *  - le groupe ne doit pas avoir de créneau réservé
+ *  - le créneau renseigné doit exister
+ *  - ne pas être déjà réservé
+ *  - étre rattaché à un evenement
+ *  - correspondre à un evenement auquel l'étudiant à acces (même promo)
+ * @param req
+    * query : doit contenir l'id d'un group et de l'étudiant authentifié
+    * body : doit contenir l'id d'un slot
+ * @param res
+ * @param next
+ * @returns {Promise<*|CancelableRequest<any>>}
+ */
 module.exports = async (req, res, next) => {
     try {
         const idGroup = req.query.idGroup; //recuperation de l'id du groupe à modifier
@@ -41,9 +58,8 @@ module.exports = async (req, res, next) => {
             return res.status(400).json({error: "Le créneaux que vous voulez reserver ne correspond à aucun évènement"})
         }
 
-        //on vérifie que le slot correspond à un event rattaché à la promo du groupe (de l'étudiant)
-        const student = await studentController.getStudentById(idStudent);
-        if(event.promo.toString() !== student.promo.toString()){
+        //on vérifie que le slot correspond à un event rattaché à la promo du groupe
+        if(event.promo.toString() !== group.promo.toString()){
             return res.status(400).json({error: "Le créneaux que vous voulez reserver ne correspond pas à un " +
                     "évènement auquel vous avez accés"})
         }
