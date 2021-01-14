@@ -6,7 +6,7 @@ module.exports = async (req, res, next) => {
         const teacherId = req.query.idTeacher;
         const slotId = req.query.idSlot;
 
-        const teacher = await teacherController.getTeacherId(teacherId);
+        const teacher = await teacherController.getTeacherById(teacherId);
         if (teacher === null) {
             return res.status(400).json({ error: 'Le teacher spécifié n\'existe pas.' });
         }
@@ -17,7 +17,7 @@ module.exports = async (req, res, next) => {
         }
 
         const teacherSlotList = teacher.slotList;
-        if (teacherSlotList !== undefined || teacherSlotList.length >= 1) {
+        if (teacherSlotList !== undefined && teacherSlotList.length >= 1) {
             if (await slotController.datesOverlapsWithSlotList(slotId, teacherSlotList)) {
                 return res.status(400).json({ error: 'Ce slot chevauchera un slot déjà existant du teacher.' });
             }
