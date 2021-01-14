@@ -23,6 +23,7 @@ Les middlewares auth, deadlineMiddleware et groupAutorization  ont été passés
  *  - ne pas être déjà réservé
  *  - étre rattaché à un evenement
  *  - correspondre à un evenement auquel l'étudiant à acces (même promo)
+ *  - ne pas chevaucher un créneau du teacher référent pour qu'il puisse assister à la soutenance
  * @param req
     * query : doit contenir l'id d'un group et de l'étudiant authentifié
     * body : doit contenir l'id d'un slot
