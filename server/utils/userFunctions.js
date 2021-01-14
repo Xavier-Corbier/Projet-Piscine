@@ -9,7 +9,7 @@ const studentController = require('../controllers/studentController');
 const createNameByEmail = (email) => {
     const PN = email.split('@')[0];
     const prenom = PN.split('.')[0];
-    const nom = PN.split('.')[1].replace(new RegExp("[^(a-zA-Z)]", "g"), ''); //supprime les chiffres possibles
+    const nom = PN.split('.')[1].replace(new RegExp("[^(a-zA-Z)\-]", "g"), ''); //supprime les chiffres possibles
     const prenomCapitalized = prenom.charAt(0).toUpperCase() + prenom.slice(1);
     const nomCapitalized = nom.charAt(0).toUpperCase() + nom.slice(1);
     return [prenomCapitalized, nomCapitalized];

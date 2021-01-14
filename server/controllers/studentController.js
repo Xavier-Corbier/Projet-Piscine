@@ -282,6 +282,31 @@ const getStudentByPromo = async (promo) => {
 };
 
 /**
+ * Retourne la liste des étudiants ayant comme promo la promo entré en paramètre mais sans le numéro étudiant
+ * @param promo : String correspondant à une promo valide
+ * @returns {Promise<any>} du type
+ [
+ {
+	    "_id": ObjectId,
+	    "firstname": String,
+	    "lastname": String,
+	    "promo": String,
+	    "email": String,
+	    "__v": Int
+    }
+ ...
+ ]
+ */
+const getStudentByPromoWithoutStudentNumber = async (promo) => {
+    //renvoi la liste des étudiants appartenant à une promo précise
+    try{
+        return await Student.find({promo: promo}).select('-password -studentNumber');
+    }catch (e) {
+        console.log(e.message);
+    }
+};
+
+/**
  * Modification de la propriété "mot de passe" d'un étudiant par son email
  * @param email : String
  * @param newPassword : String
@@ -337,5 +362,6 @@ module.exports = {
     deleteStudent,
     updatePassword,
     getStudentByPromo,
+    getStudentByPromoWithoutStudentNumber,
     studentExist
 };
