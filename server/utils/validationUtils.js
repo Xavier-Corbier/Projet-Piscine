@@ -43,7 +43,7 @@ const isPromo = (promo) => {
  * @return {*} true si la String est dans le bon format; false sinon
  */
 const isAlphaNumeric = (string) => {
-    const eventNameRegex = /\w+/;
+    const eventNameRegex = /[A-Za-z0-9]/;
     return eventNameRegex.test(string);
 };
 

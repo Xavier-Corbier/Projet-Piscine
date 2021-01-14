@@ -8,17 +8,18 @@ module.exports = async (req, res, next) => {
       const body = req.body;
       cleanUtils.cleanSlot(body);
 
-      // Vérifications sur le format des données
       if (await slotController.overlaps(body) === true) {
           return res.status(400).json({ error: 'Le slot que vous essayez de modifier ' +
-                  'chevauchera un slot déjà existant avec les attributs que vous lui donnez.'});
+                  'chevauchera un slot déjà existant (plages horaires concurrentes dans la même salle)'});
       }
       if (validationUtils.isEditable(body, ['room', 'groupId']) === false) {
           return res.status(400).json({ error: 'Certains attributs du slots que ' +
-                  'vous essayez de modifier ne sont pas modifiables.'});
+                  'vous essayez de modifier ne sont pas modifiables. ' +
+                  'Pour modifier les membres du jury utilisez les routes prévues à cet effet.'});
       }
 
-      if (await slotController.getSlotById(slotId) === undefined) {
+      const slot = await slotController.getSlotById(slotId);
+      if (slot === null) {
           return res.status(400).json({ message: 'Ce slot n\'existe pas.' });
       }
 
