@@ -76,7 +76,7 @@ module.exports = async (req, res, next) => {
             isJury = true
         }else if (teacherSlotList !== undefined || teacherSlotList.length >= 1) { //sinon on regarde si un de ses slot
             // ne chevauche pas le slot que le groupe veut réserver
-            if (await slotController.datesOverlapsWithSlotList(slotId, teacherSlotList)) {
+            if (await slotController.datesOverlapsWithSlotList(idSlot, teacherSlotList)) {
                 return res.status(400).json({error: "Vous ne pouvez pas réserver ce créneaux, votre prof référant ne " +
                         "sera pas disponible pour y assister"})
             }
