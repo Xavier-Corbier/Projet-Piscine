@@ -40,10 +40,10 @@ module.exports = async (req, res , next) => {
                 return false;
             }
         } else { //aucun header trouvé
-            res.status(401).json({message : "Aucun token "})
+            res.status(401).json({error : "Aucun token "})
         }
     }catch(error) {
         console.log(error)
-        res.status(401).json({message: "Unauthorized"});
+        res.status(401).json({error: "Unauthorized"});
     }
 };

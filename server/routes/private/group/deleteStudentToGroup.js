@@ -52,9 +52,20 @@ module.exports = async (req, res, next) => {
         //on regarde si l'étudiant à supprimer est le dernier du group
         const group = await groupController.getGroupById(idGroup);
         const studentList = group.studentList;
-        console.log(group)
         if(studentList.length <= 1){
-            //si oui on supprimer le group
+            //si oui on supprimer le group : il faut vérifier si le group n'avait pas réservé un créneau
+            const idSlot = group.slot;
+            if(idSlot){
+                //Etape 1 : supprimer le groupe du slot
+                await slotController.removeGroupFromSlot(idSlot);
+
+                //Etape 2 : supprimer le slot du teacher
+                await teacherController.deleteSlotOfTeacher(group.teacher, idSlot);
+
+                //Etape 3 : supprimer le teacher du jury du slot
+                await slotController.removeTeacherFromSlot(idSlot, group.teacher);
+            }
+
             await groupController.deleteGroup(idGroup);
             return res.status(200).json({message: "Le groupe à été supprimé"})
         }

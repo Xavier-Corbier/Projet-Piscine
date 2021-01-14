@@ -11,7 +11,8 @@ Les middlewares auth, deadlineMiddleware et groupAutorization  ont été passés
  */
 
 /**
- * Suppression ude slot d'un group : supprime le slot du group, le group du slot et le slot du teacher référent
+ * Suppression ude slot d'un group : supprime le slot du group, le group du slot, le slot du teacher référent et le
+ * teacher des jury du slot
  * Préconditions :
  * - le groupe doit avoir un créneau réservé
  * @param req
@@ -33,20 +34,23 @@ module.exports = async (req, res, next) => {
 
         //on supprime le créneau
         //Etape 1 : suppresion du creneau dans le group
-        const groupUpdate = await groupController.deleteSlotOfGroup(id,idSlot);
+        const groupUpdate = await groupController.deleteSlotOfGroup(idGroup, idSlot);
 
         //Etape 2 : suppresion du group dans le creneau
-        //TODO : supprimer le group du créneau
+        await slotController.removeGroupFromSlot(idSlot);
 
         //Etape 3 : suppression du slot pour le teacher référent
         const idTeacher = group.teacher;
-        await teacherController.deleteSlotOfTeacher(idTeacher, idSlotd);
+        await teacherController.deleteSlotOfTeacher(idTeacher, idSlot);
+
+        //Etape 4 : suppresion du teacher référent de la liste des jury
+        await slotController.removeTeacherFromSlot(idSlot, idTeacher);
 
         //La suppression à été effectué
         return res.status(200).json(group);
 
     }catch(error){
         console.log(error.message);
-        return res.status(500).json({error: "Impossible de supprimer ce slot de du groupe"});
+        return res.status(500).json({error: "Impossible de supprimer ce slot du groupe"});
     }
 }
