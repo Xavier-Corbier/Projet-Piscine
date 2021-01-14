@@ -7,19 +7,23 @@ module.exports = async (req, res, next) => {
         const slotId = req.query.idSlot;
 
         const teacher = await teacherController.getTeacherId(teacherId);
-        if (teacherId === undefined) {
+        if (teacher === null) {
             return res.status(400).json({ error: 'Le teacher spécifié n\'existe pas.' });
         }
 
         const slot = await slotController.getSlotById(slotId);
-        if (slot === undefined) {
+        if (slot === null) {
             return res.status(400).json({ error: 'Le slot spécifié n\'existe pas.' });
         }
 
         const teacherSlotList = teacher.slotList;
         if (teacherSlotList !== undefined || teacherSlotList.length >= 1) {
             if (await slotController.datesOverlapsWithSlotList(slotId, teacherSlotList)) {
-                return res.status(400).json({ error: 'Le teacher possède déjà un slot qui chevauche cet horaire.' });
+                return res.status(400).json({ error: 'Ce slot chevauchera un slot déjà existant du teacher.' });
+            }
+
+            if (slot.jury.includes(teacherId) === true) {
+                return res.status(400).json({ error: 'Ce teacher est déjà assigné à ce slot.' });
             }
         }
 

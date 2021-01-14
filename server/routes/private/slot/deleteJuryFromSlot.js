@@ -6,15 +6,19 @@ module.exports = async (req, res, next) => {
         const teacherId = req.query.idTeacher;
         const slotId = req.query.idSlot;
 
-        if (await teacherController.getTeacherId(teacherId) === undefined) {
+        const teacher = await teacherController.getTeacherId(teacherId);
+        if (teacher === null) {
             return res.status(400).json({ error: 'Le teacher spécifié n\'existe pas.' });
         }
 
-        if (await slotController.getSlotById(slotId) === undefined) {
+        const slot = await slotController.getSlotById(slotId);
+        if (slot === null) {
             return res.status(400).json({ error: 'Le slot spécifié n\'existe pas.' });
         }
 
         // Le teacher et le slot existent, on supprime les liens
+        // Même si le teacher ne possède pas le slot ce n'est pas grave, on ne supprimera rien
+        // Avec plus de temps il aurait quand même fallu faire cette vérif pour rendre le code plus propre
         await slotController.removeTeacherFromSlot(slotId, teacherId);
         await teacherController.deleteSlotOfTeacher(teacherId, slotId);
 

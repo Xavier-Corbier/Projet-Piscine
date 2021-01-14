@@ -168,7 +168,7 @@ module.exports.deleteAllSlotsByEventId = async (eventId) => {
 /**
  * Calcule et retourne la date de fin d'un slot à partir de son id.
  * @param slotId l'id du slot dont on veut la date de fin
- * @return {Promise<number>} une Promise contenant la date de fin du slot s'il n'y a pas d'erreur
+ * @return {Promise<Date>} une Promise contenant la date de fin du slot s'il n'y a pas d'erreur
  */
 // fonction privée donc pas exportée
 const getEndDate = async (slotId) => {
@@ -176,8 +176,8 @@ const getEndDate = async (slotId) => {
         const slot = await Slot.findOne({ _id: slotId });
         const event = await Event.findOne({ _id: slot.eventId });
         const date = slot.date;
-
-        return date.setMinutes(date.getMinutes + event.slotDuration);
+        date.setMinutes(date.getMinutes() + 30);
+        return date;
     } catch (error) {
         console.error(error);
         throw error;
@@ -240,8 +240,8 @@ const datesOverlapsWith = async (slotId1, slotId2) => {
     const slot2 =  await Slot.findOne({ _id: slotId2 });
     const startDate1 = slot1.date;
     const startDate2 = slot2.date;
-    const endDate1 = getEndDate(slot1._id);
-    const endDate2 = getEndDate(slot2._id);
+    const endDate1 = await getEndDate(slot1._id);
+    const endDate2 = await getEndDate(slot2._id);
 
     if (startDate1 >= startDate2 && startDate1 <= endDate2) {
         // la date de début 1 chevauche le slot 2

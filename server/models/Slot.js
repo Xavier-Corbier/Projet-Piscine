@@ -6,7 +6,6 @@ const slotSchema = mongoose.Schema({
     eventId: { type: mongoose.Schema.Types.ObjectId, ref: 'Event', required: true },
     groupId: { type: mongoose.Schema.Types.ObjectId, ref: 'Group'},
     jury: [{type: mongoose.Schema.Types.ObjectId, ref: 'Teacher'}]
-    // Le slot n'a pas besoin du prof, il pourra le récupérer à partir du group
 });
 
 /*
