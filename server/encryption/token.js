@@ -32,7 +32,7 @@ const createUserToken = async (user, isAdmin) => {
             isAdmin: isAdmin,
         };
         //creation du token
-        const token = jwt.sign(tokenUser, process.env.tokenkey, {expiresIn: '200000h'});
+        const token = jwt.sign(tokenUser, process.env.tokenkey, {expiresIn: '2h'});
         //retour
         const myReturn = {
             success: true,
